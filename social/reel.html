@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Realistic Grass – vertical reel (render source)</title>
+<!--
+  Source of the 15 s vertical video (1080x1920) for TikTok / Instagram Reels / Facebook Reels.
+  Everything is driven by render(t) (t in seconds) so each frame is deterministic;
+  social/render-reel.mjs calls it for every frame and encodes the MP4.
+  Open reel.html?lang=es for Spanish, add &play to preview it live in a browser.
+  Safe zones: important text stays inside x 80–940, y 220–1500 (platform UI covers the rest).
+-->
+<style>
+  @font-face { font-family: "Anton"; src: url("../assets/fonts/anton-latin.woff2") format("woff2"); }
+  @font-face { font-family: "Inter"; font-weight: 400 800; src: url("../assets/fonts/inter-latin-var.woff2") format("woff2"); }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #1f6b2a; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: "Inter", sans-serif; color: #fff; }
+  canvas { position: absolute; left: 0; top: 0; }
+  .shade { position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(4,30,14,.55) 0%, rgba(4,30,14,.15) 30%, rgba(4,30,14,.1) 55%, rgba(4,30,14,.6) 100%); }
+  .abs { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+  #logo { width: 560px; left: 260px; top: 250px; transform-origin: 50% 50%; filter: drop-shadow(0 24px 30px rgba(0,0,0,.55)); }
+  .display { font-family: "Anton", Impact, sans-serif; text-transform: uppercase; line-height: .95; text-shadow: 0 8px 24px rgba(0,0,0,.55); }
+  #title { width: 1080px; text-align: center; top: 860px; }
+  #title .l1 { font-size: 132px; }
+  #title .l2 { font-size: 230px; color: #a6e04a; font-style: italic; }
+  #tag { width: 1080px; text-align: center; top: 640px; font-size: 80px; font-weight: 800; text-shadow: 0 4px 16px rgba(0,0,0,.7); }
+  #tag span { display: block; }
+  #tag b { color: #ffd60a; }
+  #van { width: 640px; }
+  #list { left: 90px; top: 640px; width: 860px; }
+  #list li { list-style: none; display: flex; align-items: center; gap: 28px; margin: 0 0 34px; font-family: "Anton", sans-serif;
+             font-size: 70px; text-transform: uppercase; text-shadow: 0 6px 18px rgba(0,0,0,.6); will-change: transform, opacity; }
+  #list li i { flex: 0 0 86px; height: 86px; border-radius: 50%; background: #8cc63f; color: #0b2615; display: grid; place-items: center;
+               font-style: normal; font-size: 54px; font-family: "Inter", sans-serif; font-weight: 900; box-shadow: 0 6px 18px rgba(0,0,0,.4); }
+  #list li.hl { color: #ffd60a; }
+  #cta { width: 1080px; text-align: center; top: 630px; }
+  #cta .pill { display: inline-block; background: #ffd60a; color: #0b2615; font-family: "Anton", sans-serif; font-size: 84px;
+               text-transform: uppercase; padding: 14px 54px 18px; border-radius: 999px; box-shadow: 0 14px 30px rgba(0,0,0,.4); }
+  #cta .sub { margin-top: 26px; font-size: 44px; font-weight: 800; text-shadow: 0 4px 14px rgba(0,0,0,.7); }
+  #cta .phone { margin-top: 40px; font-family: "Anton", sans-serif; font-size: 150px; color: #ffd60a; text-shadow: 0 10px 28px rgba(0,0,0,.6); }
+  #cta .web { margin-top: 18px; font-size: 52px; font-weight: 800; letter-spacing: .01em; text-shadow: 0 4px 14px rgba(0,0,0,.7); }
+  #cta .area { margin-top: 18px; font-size: 38px; font-weight: 600; color: #d8f0c0; text-shadow: 0 4px 14px rgba(0,0,0,.7); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="turf" width="1080" height="1920"></canvas>
+  <div class="shade"></div>
+  <canvas id="sod" width="1080" height="1920"></canvas>
+  <img id="logo" class="abs" src="../assets/logo.webp" alt="">
+  <div id="title" class="abs display"><div class="l1"></div><div class="l2">Miami</div></div>
+  <div id="tag" class="abs"></div>
+  <img id="van" class="abs" src="../assets/van-right.webp" alt="">
+  <ul id="list" class="abs"></ul>
+  <div id="cta" class="abs"><div class="pill"></div><div class="sub"></div><div class="phone">(786) 329-9117</div>
+    <div class="web">www.realisticgrass.com</div></div>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const LANG = params.get("lang") === "es" ? "es" : "en";
+const TXT = {
+  en: { l1: "Artificial Grass", tag: ["No mowing.", "No watering.", "<b>No mud.</b>"],
+        list: ["Wholesale price", "Premium quality", "Maintenance-free", "5-Year Limited Warranty"],
+        pill: "Free Estimate", sub: "Call or text today · English & Español" },
+  es: { l1: "Grama Artificial", tag: ["Sin cortar.", "Sin regar.", "<b>Sin lodo.</b>"],
+        list: ["Precio al por mayor", "Calidad premium", "Sin mantenimiento", "Garantía limitada 5 años"],
+        pill: "Estimado Gratis", sub: "Llame o escriba hoy · Español & English" },
+}[LANG];
+document.documentElement.lang = LANG;
+document.querySelector("#title .l1").textContent = TXT.l1;
+document.getElementById("tag").innerHTML = TXT.tag.map((s) => `<span>${s}</span>`).join("");
+document.getElementById("list").innerHTML = TXT.list.map((s, i) => `<li class="${i === 3 ? "hl" : ""}"><i>✓</i>${s}</li>`).join("");
+document.querySelector("#cta .pill").textContent = TXT.pill;
+document.querySelector("#cta .sub").textContent = TXT.sub;
+
+const DURATION = 15;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));               // 0→1 between a and b
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const backOut = (x) => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const fade = (t, inA, inB, outA, outB) => Math.min(seg(t, inA, inB), 1 - seg(t, outA, outB));
+
+/* ---------- Turf background with wind (same shader as the website) ---------- */
+const gl = $("turf").getContext("webgl", { preserveDrawingBuffer: true });
+const fs = `precision mediump float;
+uniform sampler2D tex; uniform vec2 res; uniform float t; uniform float tile;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+void main(){
+  vec2 px=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y); vec2 p=px/res.y; float scale=tile/520.;
+  vec2 w=p*2.2-vec2(t*.32,t*.07); float g=noise(w)*.65+noise(w*2.3+3.1)*.35; g=smoothstep(.2,.85,g);
+  float n=noise(px*.015/scale); float fl=sin(px.x*.05+px.y*.03+t*5.+n*6.2831);
+  vec2 d=vec2(1.,.3)*(g*7.+fl*(.6+g*1.2))*scale; vec2 uv=(px-d)/vec2(tile,tile*2.);
+  vec3 c=texture2D(tex,uv).rgb; c*=.9+g*.24; c=mix(c,c*vec3(1.04,1.1,.92),g*.35); gl_FragColor=vec4(c,1.);}`;
+const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+gl.uniform2f(gl.getUniformLocation(prog, "res"), 1080, 1920);
+gl.uniform1f(gl.getUniformLocation(prog, "tile"), 760);
+const uT = gl.getUniformLocation(prog, "t");
+
+/* ---------- Turf tiles laid by the van ---------- */
+const sod = $("sod").getContext("2d");
+const TILE = 90, ROW_Y = 1455, N = Math.ceil(1080 / TILE);
+const VAN_W = 640, VAN_Y = 1060;
+const vanStart = 2.6, vanEnd = 7.4;                               // drive across the screen
+const vanX = (t) => -VAN_W - 40 + (1080 + VAN_W + 80) * seg(t, vanStart, vanEnd);
+const rearX = (t) => vanX(t) + VAN_W * 0.1;
+const tileBorn = [...Array(N)].map((_, i) => {                    // when the van's rear passes slot i
+  const cx = i * TILE + TILE / 2, x0 = rearX(vanStart), x1 = rearX(vanEnd);
+  return vanStart + (vanEnd - vanStart) * (cx - x0) / (x1 - x0);
+});
+let rnd = 7; const rand = () => ((rnd = (rnd * 16807) % 2147483647) / 2147483647);
+const spin = tileBorn.map(() => (rand() - 0.5) * 160);
+const sprites = [];
+const turfImg = new Image();
+
+function buildSprites() {
+  for (let k = 0; k < 6; k++) {
+    const c = document.createElement("canvas"); c.width = c.height = TILE;
+    const g = c.getContext("2d");
+    g.drawImage(turfImg, rand() * (turfImg.width - 300), rand() * (turfImg.height - 300), 300, 300, 0, 0, TILE, TILE);
+    const gr = g.createLinearGradient(0, 0, TILE, TILE);
+    gr.addColorStop(0, "rgba(255,255,190,.32)"); gr.addColorStop(1, "rgba(0,0,0,.08)");
+    g.fillStyle = gr; g.fillRect(0, 0, TILE, TILE);
+    g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 2; g.strokeRect(1, 1, TILE - 2, TILE - 2);
+    sprites.push(c);
+  }
+}
+
+function drawSod(t) {
+  sod.clearRect(0, 0, 1080, 1920);
+  // soil groove the tiles land in
+  sod.fillStyle = "rgba(58,42,24,.92)"; sod.fillRect(0, ROW_Y - TILE / 2, 1080, TILE);
+  for (let i = 0; i < N; i++) {
+    const p = seg(t, tileBorn[i], tileBorn[i] + 0.5);
+    if (t < tileBorn[i]) continue;
+    const e = easeOut(p), lift = Math.sin(Math.PI * p) * 0.5;
+    const fx = rearX(tileBorn[i]), fy = VAN_Y + VAN_W * 0.33;
+    const sx = i * TILE + TILE / 2;
+    const x = fx + (sx - fx) * e, y = fy + (ROW_Y - fy) * e;
+    const size = TILE * (1 + lift) * (p >= 1 ? 1 - Math.max(0, 1 - (t - tileBorn[i] - 0.5) / 0.15) * 0.08 : 1);
+    sod.globalAlpha = Math.min(1, p * 4);
+    if (lift > 0.02) { sod.fillStyle = "rgba(0,0,0,.3)"; sod.fillRect(x - size / 2 + lift * 22, y - size / 2 + lift * 26, size, size); }
+    sod.save(); sod.translate(x, y); sod.rotate((spin[i] * (1 - e) * Math.PI) / 180);
+    if (lift > 0.02) { sod.fillStyle = "#4a3620"; sod.fillRect(-size / 2 + 2, -size / 2 + size * 0.14, size, size); }
+    sod.drawImage(sprites[i % sprites.length], -size / 2, -size / 2, size, size);
+    sod.restore();
+  }
+  sod.globalAlpha = 1;
+}
+
+/* ---------- Scene timeline ---------- */
+function render(t) {
+  gl.uniform1f(uT, 3 + t * 1.15); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Logo: pops in, then moves up to the top and stays
+  const pop = backOut(seg(t, 0.15, 0.95));
+  const up = easeInOut(seg(t, 2.3, 3.0));
+  const s = (0.2 + 0.8 * pop) * (1 - 0.47 * up);
+  $("logo").style.opacity = seg(t, 0.15, 0.4);
+  $("logo").style.transform = `translateY(${-70 * up}px) scale(${s})`;
+
+  // Title "Artificial Grass / Miami"
+  const ti = easeOut(seg(t, 0.6, 1.2)), to = seg(t, 2.2, 2.6);
+  $("title").style.opacity = ti * (1 - to);
+  $("title").style.transform = `translateY(${(1 - ti) * 120 - to * 80}px)`;
+
+  // Tagline while the van drives
+  const lines = document.querySelectorAll("#tag span");
+  lines.forEach((el, i) => {
+    const a = easeOut(seg(t, 3.0 + i * 0.45, 3.4 + i * 0.45)), o = seg(t, 7.3, 7.7);
+    el.style.opacity = a * (1 - o);
+    el.style.transform = `translateX(${(1 - a) * -140}px)`;
+  });
+
+  // Van: drives across (small bounce), comes back and parks for the end card
+  const van = $("van");
+  let vx, vy = VAN_Y;
+  if (t < 11) vx = vanX(t);                                      // off-screen right after the drive
+  else { vx = -VAN_W + easeOut(seg(t, 11, 12.3)) * (VAN_W + (1080 - VAN_W) / 2); vy = 1180; }
+  const moving = (t > vanStart && t < vanEnd) || (t > 11 && t < 12.3);
+  vy += moving ? Math.sin(t * 38) * 2 : 0;
+  van.style.transform = `translate(${vx}px, ${vy}px)`;
+  van.style.opacity = t < 11 ? 1 : seg(t, 11, 11.2);
+
+  // Checklist
+  document.querySelectorAll("#list li").forEach((el, i) => {
+    const a = backOut(seg(t, 7.6 + i * 0.45, 8.1 + i * 0.45)), o = seg(t, 10.7, 11.0);
+    el.style.opacity = clamp(a) * (1 - o);
+    el.style.transform = `translateX(${(1 - a) * -700}px)`;
+  });
+
+  // End card
+  const c = backOut(seg(t, 11.1, 11.8));
+  $("cta").style.opacity = seg(t, 11.1, 11.4);
+  $("cta").style.transform = `scale(${0.7 + 0.3 * c})`;
+  const pulse = 1 + 0.035 * Math.max(0, Math.sin((t - 12) * 5));
+  document.querySelector("#cta .phone").style.transform = `scale(${t > 12 ? pulse : 1})`;
+
+  drawSod(t);
+}
+
+window.READY = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map((im) => im.decode().catch(() => {})),
+  new Promise((ok) => {
+    turfImg.onload = () => {
+      const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, turfImg);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      buildSprites(); ok();
+    };
+    turfImg.src = "../assets/turf.jpg";
+  }),
+]).then(() => { render(0); return true; });
+window.render = render;
+window.DURATION = DURATION;
+
+if (params.has("play")) {             // live preview in a browser
+  window.READY.then(() => { const t0 = performance.now();
+    const loop = (now) => { render(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop); });
+}
+</script>
+</body>
+</html>

@@ -45,3 +45,10 @@ Après toute modification : `python3 build.py`, puis commit/push sur `main`.
   `click_to_call` (clic sur le téléphone) et `generate_lead` (formulaire) — à marquer comme « conversions ».
 - **Domaine** : quand www.realisticgrass.com pointera vers le site, changer `base_url` et relancer le build
   (canonical, hreflang, sitemap et données structurées suivent).
+
+## Vidéos réseaux sociaux (`social/`)
+
+`realistic-grass-reel-en.mp4` / `-es.mp4` : 15 s, 1080×1920 (9:16), 30 fps, H.264 — TikTok, Instagram Reels,
+Facebook Reels / Stories. Piste audio muette : ajouter une musique dans l'app au moment de publier.
+Source : `social/reel.html` (aperçu live : `social/reel.html?lang=es&play`). Pour régénérer :
+`npm i playwright`, servir le dossier (`python3 -m http.server 8799`), puis `node social/render-reel.mjs en` (ou `es`).
