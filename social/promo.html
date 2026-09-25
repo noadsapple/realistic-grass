@@ -6,8 +6,9 @@
 <title>Realistic Grass – promo overlay (render source)</title>
 <!--
   Transparent overlay (texts, logo, ticker, van) laid over the lawn footage by
-  social/render-promo.mjs. ?format=square (1080x1080, default) or ?format=vertical (1080x1920,
-  keeps TikTok/Reels safe zones: nothing important above y 220 or below y 1510). Driven by render(t); scene timing = social/timing-<lang>.json
+  social/render-promo.mjs. ?format=square (1080x1080, default), ?format=vertical (1080x1920,
+  keeps TikTok/Reels safe zones: nothing important above y 220 or below y 1510) or
+  ?format=landscape (1920x1080: YouTube, website, Facebook). Driven by render(t); scene timing = social/timing-<lang>.json
   (same voice-over as the reels):
     v1 hook question · v2 "real-looking grass" · v3 benefits · v4 call to action.
   ?lang=en|es · &bg=<video url> + &play to preview over a video in a browser.
@@ -72,6 +73,28 @@
   body.v #van { width: 440px; }
   body.v #ticker { top: 1418px; height: 88px; }
   body.v #ticker .track { font-size: 50px; line-height: 88px; }
+  /* ----- landscape 1920x1080 ----- */
+  body.l, body.l #stage { width: 1920px; }
+  body.l .grad-top, body.l .grad-bot, body.l #ticker { width: 1920px; }
+  body.l .grad-bot { height: 520px; }
+  body.l #badge { left: 60px; top: 40px; width: 170px; }
+  body.l #hook { width: 1920px; top: 300px; }
+  body.l #hook div { font-size: 128px; }
+  body.l #real { left: 100px; top: 640px; width: 1500px; }
+  body.l #real .big { font-size: 110px; }
+  body.l #real .sub { font-size: 44px; }
+  body.l #list { left: 100px; top: 240px; padding: 30px 40px; }
+  body.l #list li { font-size: 70px; margin: 12px 0; }
+  body.l #list li i { width: 78px; height: 78px; font-size: 48px; }
+  body.l #cta { width: 1920px; top: 80px; }
+  body.l #cta img { width: 250px; }
+  body.l #cta .pill { font-size: 66px; }
+  body.l #cta .phone { font-size: 140px; margin-top: 10px; }
+  body.l #cta .web { font-size: 46px; }
+  body.l #cta .sub { font-size: 34px; }
+  body.l #van { width: 400px; }
+  body.l #ticker { top: 990px; height: 90px; }
+  body.l #ticker .track { font-size: 50px; line-height: 90px; }
 </style>
 </head>
 <body>
@@ -92,9 +115,11 @@
 <script>
 const params = new URLSearchParams(location.search);
 const LANG = params.get("lang") === "es" ? "es" : "en";
-const VERT = params.get("format") === "vertical";
+const VERT = params.get("format") === "vertical", LAND = params.get("format") === "landscape";
 if (VERT) document.body.classList.add("v");
-const H = VERT ? 1920 : 1080, TICK_Y = VERT ? 1418 : 1002, VAN_W = VERT ? 440 : 330;
+if (LAND) document.body.classList.add("l");
+const W = LAND ? 1920 : 1080, H = VERT ? 1920 : 1080;
+const TICK_Y = VERT ? 1418 : LAND ? 990 : 1002, VAN_W = VERT ? 440 : LAND ? 400 : 330;
 const TXT = {
   en: { hook: ["Tired of", "mowing, watering", "<span class='y'>&amp; mud?</span>"],
         real: "Real-looking artificial grass", realSub: "Installed in Miami · Wholesale prices",
@@ -171,7 +196,7 @@ function render(t) {
 
   // Van drives in and parks bottom-right on the end card
   const vIn = easeOut(seg(t, T.ctaStart + 0.2, T.ctaStart + 1.5));
-  const vParkX = VERT ? (1080 - VAN_W) / 2 : 1080 - VAN_W - 20;
+  const vParkX = VERT ? (W - VAN_W) / 2 : W - VAN_W - 40;
   const vx = -VAN_W - 30 + vIn * (vParkX + VAN_W + 30), vy = TICK_Y - VAN_W * 0.5 + (vIn < 1 ? Math.sin(t * 38) * 2 : 0);
   $("van").style.opacity = t > T.ctaStart ? 1 : 0;
   $("van").style.transform = `translate(${vx}px, ${vy}px)`;
@@ -179,7 +204,7 @@ function render(t) {
   // Ticker: slides up, then scrolls continuously
   if (!unitW) unitW = track.scrollWidth / 6;
   const tk = easeOut(seg(t, 0.4, 0.9));
-  $("ticker").style.transform = `translateX(${(1 - tk) * -1080}px)`;
+  $("ticker").style.transform = `translateX(${(1 - tk) * -W}px)`;
   track.style.transform = `translateX(${-((t * 150) % unitW)}px)`;
 }
 

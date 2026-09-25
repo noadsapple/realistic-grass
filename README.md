@@ -54,6 +54,7 @@ Après toute modification : `python3 build.py`, puis commit/push sur `main`.
 | `realistic-grass-square-en.mp4` / `-es.mp4` | 1080×1080 (1:1) | Fil Facebook et Instagram |
 | `realistic-grass-promo-vertical-en.mp4` / `-es.mp4` | 1080×1920 (9:16) | TikTok, Reels, Stories — même promo, format vertical |
 | `realistic-grass-promo-square-en.mp4` / `-es.mp4` | 1080×1080 (1:1) | Fil Facebook et Instagram — vraies pelouses en fond + voix off + textes (`promo.html`, `render-promo.mjs`) |
+| `realistic-grass-estate-{landscape,vertical,square}-{en,es}.mp4` | 1920×1080 / 1080×1920 / 1080×1080 | Même promo sur les plans extérieurs de la 4ᵉ vidéo (ralentis et interpolés) — `render-promo.mjs <lang> <fond> <format> realistic-grass-estate` |
 | `realistic-grass-lawns-miami.mp4` | 1080×1920 (9:16) | Montage des plans extérieurs avec herbe (sans texte) |
 
 Voix off + musique incluses (30 fps, H.264 / AAC).
