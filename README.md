@@ -48,7 +48,24 @@ Après toute modification : `python3 build.py`, puis commit/push sur `main`.
 
 ## Vidéos réseaux sociaux (`social/`)
 
-`realistic-grass-reel-en.mp4` / `-es.mp4` : 15 s, 1080×1920 (9:16), 30 fps, H.264 — TikTok, Instagram Reels,
-Facebook Reels / Stories. Piste audio muette : ajouter une musique dans l'app au moment de publier.
-Source : `social/reel.html` (aperçu live : `social/reel.html?lang=es&play`). Pour régénérer :
-`npm i playwright`, servir le dossier (`python3 -m http.server 8799`), puis `node social/render-reel.mjs en` (ou `es`).
+| Fichier | Format | Usage |
+|---|---|---|
+| `realistic-grass-vertical-en.mp4` / `-es.mp4` | 1080×1920 (9:16) | TikTok, Instagram Reels, Facebook Reels / Stories |
+| `realistic-grass-square-en.mp4` / `-es.mp4` | 1080×1080 (1:1) | Fil Facebook et Instagram |
+
+Voix off + musique incluses (30 fps, H.264 / AAC).
+
+- **Voix off** : synthèse Kokoro-82M v1.0 (licence Apache-2.0, usage commercial autorisé) via sherpa-onnx —
+  voix `af_heart` (EN) et `ef_dora` (ES). Texte dans `make-audio.py` (`SCRIPT`).
+- **Musique** : composée par programme dans `make-audio.py` (batterie, basse, accords, arpège — aucun
+  échantillon ni morceau tiers), donc libre de droits ; baissée automatiquement sous la voix.
+- La durée des scènes suit la voix : `make-audio.py` écrit `timing-<lang>.json`, lu par le rendu.
+
+Régénérer :
+```bash
+pip install sherpa-onnx numpy          # + modèle kokoro-int8-multi-lang-v1_0 (voir en-tête de make-audio.py)
+KOKORO_DIR=/chemin/kokoro-int8-multi-lang-v1_0 python3 social/make-audio.py en es
+npm i playwright && python3 -m http.server 8799 &
+node social/render-reel.mjs en vertical   # es, square…
+```
+Aperçu animé sans rendu : `social/reel.html?lang=es&format=square&play`.
