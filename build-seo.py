@@ -160,6 +160,20 @@ def seo_block(file, path, lang, key, kind, src):
          **({"dateModified": UPDATED} if UPDATED else {})},
     ]
     if kind == "home":
+        timing = json.load(open(f"social/timing-{lang}.json"))
+        secs = round(timing["duration"])
+        graph.append({
+            "@type": "VideoObject", "@id": url + "#video", "inLanguage": f"{lang}-US",
+            "name": {"en": "Artificial Grass in Miami – Realistic Grass",
+                     "es": "Grama Artificial en Miami – Realistic Grass"}[lang],
+            "description": desc,
+            "thumbnailUrl": BASE + f"social/posters/promo-square-{lang}.jpg",
+            "contentUrl": BASE + f"social/realistic-grass-promo-square-{lang}.mp4",
+            "uploadDate": UPDATED or "2026-09-25",
+            "duration": f"PT{secs}S",
+            "publisher": {"@id": BASE + "#business"},
+        })
+        graph[2]["video"] = {"@id": url + "#video"}
         faq = faq_from_page(src)
         if faq:
             graph.append({"@type": "FAQPage", "@id": url + "#faq", "inLanguage": f"{lang}-US", "mainEntity": faq})

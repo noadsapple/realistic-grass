@@ -77,6 +77,9 @@ def build(page, out, lang_links):
     sub = "es/" if page.startswith("es/") else ""
     for doc in ("privacy.html", "warranty.html", "privacidad.html", "garantia.html"):
         html = html.replace(f'href="{doc}', f'href="{live}{sub}{doc}')
+    # Videos, posters and captions are served from the live site
+    html = html.replace('"../social/', '"social/').replace('"social/', f'"{live}social/')
+    html = html.replace('href="es/#video"', f'href="{ES_OUT}#video"').replace('href="../#video"', f'href="{EN_OUT}#video"')
     # EN | ES switcher points at the other standalone file
     for old, new in lang_links.items():
         html = html.replace(old, new)

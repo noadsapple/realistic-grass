@@ -191,6 +191,17 @@ main { padding: 0 clamp(1rem, 4vw, 3rem); }
 .strip p { margin: 0; font-size: clamp(1rem, 2.3vw, 1.5rem); }
 .strip i { color: var(--green-700); font-style: normal; margin: 0 .4rem; }
 
+/* ---------- Video ---------- */
+.video-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.2rem, 3vw, 2.5rem); align-items: center; }
+.video-wrap { margin: 0; }
+.video-wrap video { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 16px; background: #0a3a20;
+                    box-shadow: 0 16px 34px rgba(0,0,0,.4); }
+.video-wrap figcaption { margin-top: .6rem; font-size: .9rem; text-align: center; opacity: .9; }
+.video-wrap figcaption a, .video-copy a:not(.btn) { color: var(--yellow); }
+.video-copy h2 { font-size: clamp(2rem, 4.2vw, 3rem); }
+.video-copy .hero-ctas { margin: 1.4rem 0 0; }
+@media (max-width: 860px) { .video-grid { grid-template-columns: 1fr; } }
+
 /* ---------- Cards ---------- */
 .cards { display: grid; gap: 1.2rem; }
 .cards-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
