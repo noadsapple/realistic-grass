@@ -1,5 +1,7 @@
 # Realistic Grass — site vitrine (Artificial Grass Miami)
 
+**En ligne : https://noadsapple.github.io/realistic-grass/** (branche `gh-pages`, mise à jour automatiquement à chaque push sur `main`).
+
 Site statique (HTML/CSS/JS, aucune dépendance) — ouvrir `index.html` ou servir le dossier :
 
 ```bash

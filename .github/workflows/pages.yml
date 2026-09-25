@@ -1,7 +1,8 @@
-name: Deploy Realistic Grass site to GitHub Pages
+name: Publish site to GitHub Pages
 
-# Publie le site statique (racine du dépôt) sur GitHub Pages.
-# Prérequis (une seule fois) : Settings → Pages → Source : « GitHub Actions ».
+# GitHub Pages sert la branche gh-pages (Settings → Pages → Deploy from a branch).
+# À chaque push sur main, ce workflow copie le site dans gh-pages ;
+# GitHub reconstruit alors https://noadsapple.github.io/realistic-grass/
 
 on:
   push:
@@ -10,32 +11,29 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Push site to gh-pages
+        run: |
+          set -e
+          rm -rf .git/ /tmp/site && mkdir /tmp/site
+          cp -r . /tmp/site/ && rm -rf /tmp/site/.github
+          touch /tmp/site/.nojekyll
+          cd /tmp/site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Publish ${GITHUB_SHA::7} from main"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
