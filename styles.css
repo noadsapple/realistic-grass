@@ -95,7 +95,7 @@ h1, h2, .brand-text, .big-phone, .strip p, .badges b, .stat b, .steps span {
 .brand img { width: 62px; height: auto; }
 .brand-text { font-size: 1.55rem; line-height: 1; }
 .brand-text b { font-weight: 400; color: var(--white); }
-.brand-text { color: var(--lime-bright); }
+.brand-text { color: var(--lime-bright); white-space: nowrap; }
 .brand-text small {
   display: block; font-family: "Inter", sans-serif; font-size: .7rem; letter-spacing: .12em;
   color: #d8f0c0; margin-top: .25rem; font-weight: 600;
@@ -103,6 +103,10 @@ h1, h2, .brand-text, .big-phone, .strip p, .badges b, .stat b, .steps span {
 .nav-links { display: flex; gap: clamp(.8rem, 1.6vw, 1.4rem); margin-left: auto; }
 .nav-links a { text-decoration: none; font-weight: 600; opacity: .92; white-space: nowrap; }
 .nav-links a:hover { color: var(--lime-bright); }
+.lang { display: flex; border: 2px solid rgba(255,255,255,.35); border-radius: 999px; overflow: hidden; flex-shrink: 0; }
+.lang a { padding: .3rem .6rem; font-weight: 800; font-size: .8rem; text-decoration: none; letter-spacing: .05em; }
+.lang a[aria-current="page"] { background: var(--lime); color: var(--ink); }
+.lang a:not([aria-current]):hover { background: rgba(255,255,255,.15); }
 .burger { display: none; background: none; border: 0; padding: .4rem; cursor: pointer; margin-left: auto; }
 .burger span { display: block; width: 26px; height: 3px; background: #fff; margin: 5px 0; border-radius: 2px; }
 
@@ -294,7 +298,8 @@ main { padding: 0 clamp(1rem, 4vw, 3rem); }
   .nav-links.open { display: flex; }
   .nav-links a { padding: .7rem 0; border-bottom: 1px solid rgba(255,255,255,.1); }
   .nav-cta { display: none; }
-  .burger { display: block; }
+  .burger { display: block; margin-left: .6rem; }
+  .lang { margin-left: auto; }
   .topbar-sep, .topbar > span:first-child { display: none; }
   .topbar { font-size: .82rem; }
   .float-call { display: grid; }
@@ -304,8 +309,13 @@ main { padding: 0 clamp(1rem, 4vw, 3rem); }
   .apps { grid-template-columns: 1fr 1fr; }
   .checks { grid-template-columns: 1fr; }
   .qr { position: static; margin-top: 1rem; display: inline-block; }
-  .brand-text { font-size: 1.25rem; }
-  .brand img { width: 50px; }
+  .brand-text { font-size: 1.1rem; }
+  .brand-text small { display: none; }
+  .brand img { width: 40px; }
+  .brand { gap: .45rem; min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  .brand-text { overflow: hidden; }
+  .nav { gap: .6rem; }
+  .lang a { padding: .25rem .45rem; }
   .hero-ctas .btn { width: 100%; }
 }
 

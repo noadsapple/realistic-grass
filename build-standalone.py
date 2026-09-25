@@ -1,4 +1,5 @@
-"""Build realistic-grass-standalone.html: the whole site in one HTML file.
+"""Build the whole site as single HTML files (one per language):
+realistic-grass-standalone.html (EN) and realistic-grass-standalone-es.html (ES).
 
 Every image is embedded once (base64) in an IMG table; the page fills the
 <img>/<link> tags from it at load. Usage:  python3 build-standalone.py
@@ -36,30 +37,43 @@ IMAGES = {
     "assets/turf.jpg": data_uri("assets/turf.jpg", "JPEG", 78),
 }
 
-html = open("index.html").read()
-css = open("styles.css").read()
-js = open("script.js").read()
-
-css = css.replace('url("assets/turf.jpg")', "var(--turf-img)")
+CSS = open("styles.css").read().replace('url("assets/turf.jpg")', "var(--turf-img)")
+JS = open("script.js").read()
 for key in IMAGES:
-    js = js.replace(f'"{key}"', f'IMG["{key}"]')
-
-# Relative asset URLs are meaningless in a single file
-html = html.replace('  <meta property="og:image" content="assets/logo.png">\n', "")
-html = html.replace('    "image": "assets/logo.png",\n', "")
-html = html.replace('<link rel="icon" href="assets/logo.png">', '<link rel="icon" data-img="assets/logo.png">')
-for key in IMAGES:
-    html = html.replace(f'src="{key}"', f'data-img="{key}"')
-
-table = "const IMG = {\n" + ",\n".join(f'  "{k}": "{v}"' for k, v in IMAGES.items()) + "\n};\n"
-fill = """document.querySelectorAll("[data-img]").forEach((el) => {
+    JS = JS.replace(f'"{key}"', f'IMG["{key}"]')
+TABLE = "const IMG = {\n" + ",\n".join(f'  "{k}": "{v}"' for k, v in IMAGES.items()) + "\n};\n"
+FILL = """document.querySelectorAll("[data-img]").forEach((el) => {
   el[el.tagName === "LINK" ? "href" : "src"] = IMG[el.dataset.img];
 });
 document.documentElement.style.setProperty("--turf-img", `url("${IMG["assets/turf.jpg"]}")`);
 """
-html = html.replace('<link rel="stylesheet" href="styles.css">', "<style>\n" + css + "\n</style>")
-html = html.replace('<script src="script.js"></script>', "<script>\n" + table + fill + js + "\n</script>")
 
-assert 'src="assets/' not in html and "href=\"styles.css\"" not in html
-open("realistic-grass-standalone.html", "w").write(html)
-print(f"realistic-grass-standalone.html: {len(html) // 1024} KB")
+EN_OUT = "realistic-grass-standalone.html"
+ES_OUT = "realistic-grass-standalone-es.html"
+
+
+def build(page, out, lang_links):
+    html = open(page).read()
+    # The Spanish page lives in es/ and points one level up
+    html = html.replace('"../assets/', '"assets/').replace('"../styles.css"', '"styles.css"')
+    html = html.replace('"../script.js"', '"script.js"')
+    # Relative asset URLs are meaningless in a single file
+    html = html.replace('  <meta property="og:image" content="assets/logo.png">\n', "")
+    html = html.replace('    "image": "assets/logo.png",\n', "")
+    html = html.replace('<link rel="icon" href="assets/logo.png">', '<link rel="icon" data-img="assets/logo.png">')
+    for key in IMAGES:
+        html = html.replace(f'src="{key}"', f'data-img="{key}"')
+    # EN | ES switcher points at the other standalone file
+    for old, new in lang_links.items():
+        html = html.replace(old, new)
+    html = html.replace('<link rel="stylesheet" href="styles.css">', "<style>\n" + CSS + "\n</style>")
+    html = html.replace('<script src="script.js"></script>', "<script>\n" + TABLE + FILL + JS + "\n</script>")
+    assert 'src="assets/' not in html and 'href="styles.css"' not in html
+    open(out, "w").write(html)
+    print(f"{out}: {len(html) // 1024} KB")
+
+
+build("index.html", EN_OUT, {'<a href="./" aria-current': f'<a href="{EN_OUT}" aria-current',
+                              '<a href="es/" hreflang="es"': f'<a href="{ES_OUT}" hreflang="es"'})
+build("es/index.html", ES_OUT, {'<a href="../" hreflang="en"': f'<a href="{EN_OUT}" hreflang="en"',
+                                 '<a href="./" aria-current': f'<a href="{ES_OUT}" aria-current'})

@@ -1,6 +1,11 @@
 (() => {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const PHONE = "+17863299117";
+  const ES = document.documentElement.lang === "es";
+  // Asset URLs are resolved from this script's location so pages in
+  // sub-folders (es/) load the same files.
+  const BASE = (document.currentScript && document.currentScript.src) || location.href;
+  const asset = (p) => new URL(p, BASE).href;
 
   /* ------------------------------------------------------------------
    * 1. Turf background swaying in the wind (WebGL).
@@ -105,7 +110,7 @@
         };
         requestAnimationFrame(frame);
       };
-      img.src = "assets/turf.jpg";
+      img.src = asset("assets/turf.jpg");
     } catch (e) {
       console.warn("Turf animation disabled:", e);
       canvas.style.display = "none";
@@ -133,7 +138,7 @@
   const van = document.getElementById("van");
   const imgR = van.querySelector("img");
   const imgL = document.createElement("img");
-  imgL.src = "assets/van-left.png";
+  imgL.src = asset("assets/van-left.png");
   imgL.alt = "";
   van.appendChild(imgL);
   [imgR, imgL].forEach((im) => Object.assign(im.style, {
@@ -236,7 +241,7 @@
   // hairline seam; while a tile falls its brown latex backing shows as a
   // thickness under it, like a real sod square.
   const turfImg = new Image();
-  turfImg.src = "assets/turf.jpg";
+  turfImg.src = asset("assets/turf.jpg");
   let sprites = [];
   const buildSprites = () => {
     sprites = [];
@@ -402,11 +407,15 @@
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const d = new FormData(form);
-    const body =
-      `Free estimate request – Realistic Grass\n` +
-      `Name: ${d.get("name")}\nPhone: ${d.get("phone")}\n` +
-      `City/Zip: ${d.get("city") || "-"}\nProject: ${d.get("project")}\n` +
-      `Area: ${d.get("area") || "-"} sq ft\n${d.get("msg") || ""}`;
+    const body = ES
+      ? `Solicitud de estimado gratis – Realistic Grass\n` +
+        `Nombre: ${d.get("name")}\nTeléfono: ${d.get("phone")}\n` +
+        `Ciudad/Código postal: ${d.get("city") || "-"}\nProyecto: ${d.get("project")}\n` +
+        `Área: ${d.get("area") || "-"} pies²\n${d.get("msg") || ""}`
+      : `Free estimate request – Realistic Grass\n` +
+        `Name: ${d.get("name")}\nPhone: ${d.get("phone")}\n` +
+        `City/Zip: ${d.get("city") || "-"}\nProject: ${d.get("project")}\n` +
+        `Area: ${d.get("area") || "-"} sq ft\n${d.get("msg") || ""}`;
     window.location.href = `sms:${PHONE}?&body=${encodeURIComponent(body)}`;
     let note = form.querySelector(".form-sent");
     if (!note) {
@@ -414,7 +423,9 @@
       note.className = "form-note form-sent";
       form.appendChild(note);
     }
-    note.innerHTML = 'Your messaging app should open with your request. If not, call us at <a href="tel:' +
-      PHONE + '" style="color:#ffd60a;font-weight:800">(786) 329-9117</a>.';
+    const call = '<a href="tel:' + PHONE + '" style="color:#ffd60a;font-weight:800">(786) 329-9117</a>';
+    note.innerHTML = ES
+      ? "Su aplicación de mensajes debería abrirse con su solicitud. Si no, llámenos al " + call + "."
+      : "Your messaging app should open with your request. If not, call us at " + call + ".";
   });
 })();
