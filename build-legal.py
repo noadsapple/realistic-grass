@@ -3,9 +3,38 @@
 Content lives here so the four pages share one header/footer.
 Usage:  python3 build-legal.py
 """
+import json
 import os
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+GA = json.load(open("site.json")).get("ga4_measurement_id", "").strip()
+
+ANALYTICS_EN = (
+    "<li><b>Website analytics</b>: we use Google Analytics to understand how visitors use this site (pages viewed, "
+    "approximate location, device, how you found us, and clicks on our phone number or estimate form). Google Analytics "
+    "sets cookies and processes this data for us under Google's privacy policy. We do not use it for advertising. "
+    "Analytics is not loaded if your browser sends a Global Privacy Control or Do Not Track signal, and you can also opt out "
+    'with the <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">Google Analytics opt-out browser add-on</a>.</li>'
+    if GA else
+    "<li><b>No cookies or trackers</b>: we do not use cookies, analytics, advertising pixels or any tool that tracks you "
+    "across websites. The only thing stored on your device is your choice to pause the animations, and it stays in your browser.</li>"
+)
+ANALYTICS_ES = (
+    "<li><b>Estadísticas del sitio</b>: usamos Google Analytics para entender cómo se usa este sitio (páginas vistas, "
+    "ubicación aproximada, dispositivo, cómo nos encontró y clics en nuestro teléfono o en el formulario de estimado). "
+    "Google Analytics usa cookies y trata estos datos por nuestra cuenta según la política de privacidad de Google. No lo "
+    "usamos con fines publicitarios. No se carga si su navegador envía una señal Global Privacy Control o Do Not Track, y "
+    'también puede desactivarlo con el <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">complemento de '
+    "inhabilitación de Google Analytics</a>.</li>"
+    if GA else
+    "<li><b>Sin cookies ni rastreadores</b>: no usamos cookies, herramientas de análisis, píxeles publicitarios ni nada que "
+    "le rastree entre sitios web. Lo único que se guarda en su dispositivo es su elección de pausar las animaciones, y se "
+    "queda en su navegador.</li>"
+)
+DNT_EN = ("If your browser sends a “Do Not Track” or Global Privacy Control signal, Google Analytics is not loaded." if GA else
+          "We do not track visitors across websites, so browser “Do Not Track” signals do not change how this site works.")
+DNT_ES = ("Si su navegador envía una señal “Do Not Track” o Global Privacy Control, Google Analytics no se carga." if GA else
+          "No rastreamos a los visitantes entre sitios web, por lo que las señales “Do Not Track” del navegador no cambian el funcionamiento de este sitio.")
 
 UPDATED = {"en": "September 25, 2026", "es": "25 de septiembre de 2026"}
 COMPANY = "Realistic Grass LLC"
@@ -52,12 +81,9 @@ def page(lang, key, title, description, body):
   <title>{title} | {COMPANY}</title>
   <meta name="description" content="{description}">
   <meta name="theme-color" content="#0f4d2c">
-  <link rel="icon" href="{up}assets/logo.png">
+  <link rel="icon" href="{up}assets/logo-sm.webp">
   <link rel="alternate" hreflang="en" href="{base}{PATHS[('en', key)]}">
   <link rel="alternate" hreflang="es" href="{base}{PATHS[('es', key)]}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{up}styles.css">
 </head>
 <body class="doc">
@@ -67,7 +93,7 @@ def page(lang, key, title, description, body):
 
   <header class="nav" id="top">
     <a href="{u['home']}" class="brand">
-      <img src="{up}assets/logo.png" alt="Realistic Grass" width="72" height="67">
+      <img src="{up}assets/logo-sm.webp" alt="Realistic Grass" width="72" height="67">
       <span class="brand-text"><b>Realistic</b> Grass<small>{u['tag']}</small></span>
     </a>
     <div class="lang" aria-label="{u['lang_label']}" style="margin-left:auto">
@@ -110,8 +136,8 @@ PRIVACY_EN = f"""      <p class="eyebrow">Legal</p>
       <h2>Information we collect</h2>
       <ul>
         <li><b>Information you give us</b>: when you use the free-estimate form, your device opens its messaging app with a text addressed to us containing the details you entered (name, phone number, city or ZIP code, project type, approximate area and your message). This website does not store what you type; we receive it only if you send the text. We also receive the information you give us when you call or text us.</li>
-        <li><b>Technical information</b>: this website is hosted on GitHub Pages, which may log IP addresses and basic request data for security and operations. Fonts are loaded from Google Fonts, so your browser connects to Google's servers. These providers process that data under their own privacy policies.</li>
-        <li><b>No cookies or trackers</b>: we do not use cookies, analytics, advertising pixels or any tool that tracks you across websites. The only thing stored on your device is your choice to pause the animations, and it stays in your browser.</li>
+        <li><b>Technical information</b>: this website is hosted on GitHub Pages, which may log IP addresses and basic request data for security and operations, under GitHub's own privacy policy.</li>
+        {ANALYTICS_EN}
       </ul>
 
       <h2>How we use your information</h2>
@@ -137,7 +163,7 @@ PRIVACY_EN = f"""      <p class="eyebrow">Legal</p>
       <p>This website is not directed to children under 13 and we do not knowingly collect their personal information.</p>
 
       <h2>“Do Not Track”</h2>
-      <p>We do not track visitors across websites, so browser “Do Not Track” signals do not change how this site works.</p>
+      <p>{DNT_EN}</p>
 
       <h2>Changes to this policy</h2>
       <p>We may update this policy. The date at the top shows when it last changed.</p>
@@ -159,8 +185,8 @@ PRIVACY_ES = f"""      <p class="eyebrow">Legal</p>
       <h2>Información que recopilamos</h2>
       <ul>
         <li><b>Información que usted nos da</b>: cuando usa el formulario de estimado gratis, su dispositivo abre su aplicación de mensajes con un texto dirigido a nosotros que contiene los datos que escribió (nombre, teléfono, ciudad o código postal, tipo de proyecto, área aproximada y su mensaje). Este sitio no guarda lo que usted escribe; solo lo recibimos si usted envía el mensaje. También recibimos la información que nos da cuando nos llama o nos escribe.</li>
-        <li><b>Información técnica</b>: este sitio está alojado en GitHub Pages, que puede registrar direcciones IP y datos básicos de las solicitudes por motivos de seguridad y funcionamiento. Las fuentes tipográficas se cargan desde Google Fonts, por lo que su navegador se conecta a los servidores de Google. Estos proveedores tratan esos datos según sus propias políticas de privacidad.</li>
-        <li><b>Sin cookies ni rastreadores</b>: no usamos cookies, herramientas de análisis, píxeles publicitarios ni nada que le rastree entre sitios web. Lo único que se guarda en su dispositivo es su elección de pausar las animaciones, y se queda en su navegador.</li>
+        <li><b>Información técnica</b>: este sitio está alojado en GitHub Pages, que puede registrar direcciones IP y datos básicos de las solicitudes por motivos de seguridad y funcionamiento, según la política de privacidad de GitHub.</li>
+        {ANALYTICS_ES}
       </ul>
 
       <h2>Cómo usamos su información</h2>
@@ -186,7 +212,7 @@ PRIVACY_ES = f"""      <p class="eyebrow">Legal</p>
       <p>Este sitio no está dirigido a menores de 13 años y no recopilamos a sabiendas su información personal.</p>
 
       <h2>“No rastrear” (Do Not Track)</h2>
-      <p>No rastreamos a los visitantes entre sitios web, por lo que las señales “Do Not Track” del navegador no cambian el funcionamiento de este sitio.</p>
+      <p>{DNT_ES}</p>
 
       <h2>Cambios en esta política</h2>
       <p>Podemos actualizar esta política. La fecha indicada arriba muestra la última modificación.</p>

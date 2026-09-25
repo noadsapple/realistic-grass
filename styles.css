@@ -1,3 +1,13 @@
+/* Fonts are self-hosted (latin subset): faster, and no request to a third party */
+@font-face {
+  font-family: "Anton"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("assets/fonts/anton-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url("assets/fonts/inter-latin-var.woff2") format("woff2");
+}
+
 :root {
   --green-900: #0a3a20;
   --green-800: #0f4d2c;

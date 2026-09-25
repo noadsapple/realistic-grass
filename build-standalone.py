@@ -8,6 +8,7 @@ Requires Pillow (pip install pillow).
 import base64
 import io
 import os
+import re
 
 from PIL import Image
 
@@ -15,6 +16,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def data_uri(path, fmt="WEBP", quality=82):
+    if fmt == "RAW":
+        return "data:image/webp;base64," + base64.b64encode(open(path, "rb").read()).decode()
     im = Image.open(path)
     buf = io.BytesIO()
     if fmt == "JPEG":
@@ -30,14 +33,22 @@ def data_uri(path, fmt="WEBP", quality=82):
 
 
 IMAGES = {
-    "assets/logo.png": data_uri("assets/logo.png"),
-    "assets/van-left.png": data_uri("assets/van-left.png"),
-    "assets/van-right.png": data_uri("assets/van-right.png"),
+    "assets/logo.webp": data_uri("assets/logo.webp", "RAW"),
+    "assets/logo-sm.webp": data_uri("assets/logo-sm.webp", "RAW"),
+    "assets/van-left.webp": data_uri("assets/van-left.webp", "RAW"),
+    "assets/van-right.webp": data_uri("assets/van-right.webp", "RAW"),
     "assets/qr.png": data_uri("assets/qr.png", "PNG"),
     "assets/turf.jpg": data_uri("assets/turf.jpg", "JPEG", 78),
+    "assets/favicon-32.png": data_uri("assets/favicon-32.png", "PNG"),
+}
+FONTS = {
+    "assets/fonts/anton-latin.woff2": "data:font/woff2;base64," + base64.b64encode(open("assets/fonts/anton-latin.woff2", "rb").read()).decode(),
+    "assets/fonts/inter-latin-var.woff2": "data:font/woff2;base64," + base64.b64encode(open("assets/fonts/inter-latin-var.woff2", "rb").read()).decode(),
 }
 
 CSS = open("styles.css").read().replace('url("assets/turf.jpg")', "var(--turf-img)")
+for key, uri in FONTS.items():
+    CSS = CSS.replace(f'url("{key}")', f'url("{uri}")')
 JS = open("script.js").read()
 for key in IMAGES:
     JS = JS.replace(f'"{key}"', f'IMG["{key}"]')
@@ -57,10 +68,8 @@ def build(page, out, lang_links):
     # The Spanish page lives in es/ and points one level up
     html = html.replace('"../assets/', '"assets/').replace('"../styles.css"', '"styles.css"')
     html = html.replace('"../script.js"', '"script.js"')
-    # Relative asset URLs are meaningless in a single file
-    html = html.replace('  <meta property="og:image" content="assets/logo.png">\n', "")
-    html = html.replace('    "image": "assets/logo.png",\n', "")
-    html = html.replace('<link rel="icon" href="assets/logo.png">', '<link rel="icon" data-img="assets/logo.png">')
+    # The SEO block (canonical, social cards, analytics, JSON-LD) belongs to the published site only
+    html = re.sub(r"\s*<!-- SEO:START.*?<!-- SEO:END -->", '\n  <link rel="icon" data-img="assets/favicon-32.png">', html, flags=re.S)
     for key in IMAGES:
         html = html.replace(f'src="{key}"', f'data-img="{key}"')
     # Legal pages are not bundled: link to the published ones

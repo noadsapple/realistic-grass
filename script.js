@@ -163,7 +163,7 @@
   const van = document.getElementById("van");
   const imgR = van.querySelector("img");
   const imgL = document.createElement("img");
-  imgL.src = asset("assets/van-left.png");
+  imgL.src = asset("assets/van-left.webp");
   imgL.alt = "";
   van.appendChild(imgL);
   [imgR, imgL].forEach((im) => Object.assign(im.style, {
@@ -430,6 +430,13 @@
 
   document.getElementById("year").textContent = new Date().getFullYear();
 
+  // Google Analytics conversion events (no-op unless GA4 is enabled in site.json)
+  const track = (name, params) => { if (typeof window.gtag === "function") window.gtag("event", name, params); };
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="tel:"]');
+    if (a) track("click_to_call", { link_url: a.href, language: ES ? "es" : "en" });
+  });
+
   const form = document.getElementById("quote-form");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -443,6 +450,7 @@
         `Name: ${d.get("name")}\nPhone: ${d.get("phone")}\n` +
         `City/Zip: ${d.get("city") || "-"}\nProject: ${d.get("project")}\n` +
         `Area: ${d.get("area") || "-"} sq ft\n${d.get("msg") || ""}`;
+    track("generate_lead", { method: "sms_form", project: d.get("project"), language: ES ? "es" : "en" });
     window.location.href = `sms:${PHONE}?&body=${encodeURIComponent(body)}`;
     let note = form.querySelector(".form-sent");
     if (!note) {
