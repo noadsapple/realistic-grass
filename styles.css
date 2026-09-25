@@ -301,6 +301,7 @@ main { padding: 0 clamp(1rem, 4vw, 3rem); }
   .burger { display: block; margin-left: .6rem; }
   .lang { margin-left: auto; }
   .topbar-sep, .topbar > span:first-child { display: none; }
+  .motion-toggle { font-size: .72rem; }
   .topbar { font-size: .82rem; }
   .float-call { display: grid; }
 }
@@ -324,3 +325,53 @@ main { padding: 0 clamp(1rem, 4vw, 3rem); }
   .hero-logo img, #van.bump img { animation: none; }
   .btn, .card { transition: none; }
 }
+
+/* ---------- Accessibility ---------- */
+.skip-link {
+  position: absolute; left: 1rem; top: -100px; z-index: 100;
+  background: var(--yellow); color: var(--ink); font-weight: 800;
+  padding: .6rem 1rem; border-radius: 8px; text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.motion-toggle {
+  font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer;
+  background: transparent; color: #d8f0c0; border: 1px solid rgba(255,255,255,.35);
+  border-radius: 999px; padding: .15rem .65rem; margin-left: .4rem;
+}
+.motion-toggle:hover { background: rgba(255,255,255,.12); }
+body.paused .hero-logo img, body.paused #van.bump img { animation-play-state: paused; }
+
+/* ---------- Form consent & footer links ---------- */
+.consent { margin: .2rem 0 0; font-size: .78rem; line-height: 1.4; opacity: .85; }
+.consent a, .footer-links a, .badges a, .card a, .faq a, .why-list a { color: var(--yellow); }
+.footer-links { margin-top: .6rem !important; }
+
+/* ---------- Legal pages (privacy, warranty) ---------- */
+body.doc { --sod: 0px; }
+.doc main { padding-top: 2rem; }
+.legal { max-width: 860px; }
+.legal h1 { font-size: clamp(2rem, 5vw, 3rem); }
+.legal h2 { font-family: "Inter", sans-serif; text-transform: none; letter-spacing: 0; font-size: 1.25rem; font-weight: 800; color: var(--lime-bright); margin: 1.8rem 0 .5rem; }
+.legal p, .legal li { opacity: .95; }
+.legal ul { padding-left: 1.2rem; }
+.legal a { color: var(--yellow); }
+.legal .meta { opacity: .75; font-size: .9rem; }
+.legal .box { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 1rem 1.2rem; }
+.legal .caps { text-transform: uppercase; font-size: .9rem; }
+.print-only { display: none; }
+.doc-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.5rem; }
+
+@media print {
+  body { background: #fff; color: #000; padding: 0; }
+  #turf, .turf-fallback, .turf-shade, .sod-groove, .topbar, .nav, .footer, .float-call, .skip-link, .doc-actions { display: none !important; }
+  .section { background: none; box-shadow: none; padding: 0; }
+  .legal h2 { color: #000; }
+  .legal a { color: #000; }
+  .legal .box { border-color: #999; background: none; }
+  .print-only { display: block; margin-top: 1.5rem; break-inside: avoid; }
+  .print-only p { margin: .7rem 0; }
+}
+
+/* Anchor jumps land below the sticky header */
+section[id], h2[id] { scroll-margin-top: calc(var(--sod) + 96px); }

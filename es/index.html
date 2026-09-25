@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Realistic Grass | Grama Artificial Miami – Instalación y Venta al por Mayor</title>
-  <meta name="description" content="Realistic Grass – expertos en grama artificial en Miami. Precios al por mayor y césped sintético de calidad premium para jardines, mascotas, putting greens, piscinas y parques infantiles. Estimado gratis, garantía de 5 años. Llame al (786) 329-9117.">
+  <meta name="description" content="Realistic Grass – expertos en grama artificial en Miami. Precios al por mayor y césped sintético de calidad premium para jardines, mascotas, putting greens, piscinas y parques infantiles. Estimado gratis, garantía limitada de 5 años. Llame al (786) 329-9117.">
   <meta name="theme-color" content="#0f4d2c">
   <link rel="icon" href="../assets/logo.png">
   <link rel="canonical" href="https://noadsapple.github.io/realistic-grass/es/">
@@ -12,7 +12,7 @@
   <link rel="alternate" hreflang="es" href="https://noadsapple.github.io/realistic-grass/es/">
   <link rel="alternate" hreflang="x-default" href="https://noadsapple.github.io/realistic-grass/">
   <meta property="og:title" content="Realistic Grass – Grama Artificial Miami">
-  <meta property="og:description" content="Grama artificial premium a precios al por mayor. Estimado gratis · Garantía de 5 años · (786) 329-9117">
+  <meta property="og:description" content="Grama artificial premium a precios al por mayor. Estimado gratis · Garantía limitada de 5 años · (786) 329-9117">
   <meta property="og:image" content="../assets/logo.png">
   <meta property="og:locale" content="es_US">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,16 +23,18 @@
   {
     "@context": "https://schema.org",
     "@type": "LandscapingBusiness",
-    "name": "Realistic Grass – Grama Artificial",
+    "name": "Realistic Grass",
+    "legalName": "Realistic Grass LLC",
     "telephone": "+1-786-329-9117",
-    "url": "https://www.magicrealisticgrass.com",
+    "url": "https://www.realisticgrass.com",
     "image": "../assets/logo.png",
     "areaServed": ["Miami", "Miami Beach", "Coral Gables", "Doral", "Hialeah", "Kendall", "Homestead", "Aventura", "Pinecrest", "Key Biscayne", "Miami Lakes", "Palmetto Bay"],
-    "address": { "@type": "PostalAddress", "addressLocality": "Miami", "addressRegion": "FL", "addressCountry": "US" }
+    "address": { "@type": "PostalAddress", "streetAddress": "407 Lincoln Road, Suite 6J", "addressLocality": "Miami Beach", "addressRegion": "FL", "postalCode": "33139", "addressCountry": "US" }
   }
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
   <!-- Fondo de grama animado (viento WebGL); si no, se muestra la foto fija -->
   <canvas id="turf" aria-hidden="true"></canvas>
   <div class="turf-fallback" aria-hidden="true"></div>
@@ -45,8 +47,9 @@
   <div class="topbar">
     <span>Expertos en Grama Artificial en <strong>Miami</strong></span>
     <span class="topbar-sep">·</span>
-    <span>Estimado Gratis · <strong>Garantía de 5 Años</strong></span>
+    <span>Estimado Gratis · <strong>Garantía Limitada de 5 Años</strong></span>
     <a href="tel:+17863299117" class="topbar-phone">(786) 329-9117</a>
+    <button type="button" class="motion-toggle" aria-pressed="false" data-pause="⏸ Pausar animaciones" data-play="▶ Reanudar animaciones">⏸ Pausar animaciones</button>
   </div>
 
   <header class="nav" id="top">
@@ -69,7 +72,7 @@
     <button class="burger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
   </header>
 
-  <main>
+  <main id="main">
     <!-- HERO -->
     <section class="hero">
       <div class="hero-copy">
@@ -81,7 +84,7 @@
           <li>Precio al por mayor</li>
           <li>Calidad premium</li>
           <li>Sin mantenimiento</li>
-          <li>Ecológico</li>
+          <li>Sin riego, sin fertilizantes</li>
           <li>Fabricado para durar</li>
         </ul>
         <div class="hero-ctas">
@@ -89,9 +92,9 @@
           <a href="#contact" class="btn btn-ghost btn-lg">Pida su Estimado Gratis</a>
         </div>
         <div class="badges">
-          <div><b>5</b><span>Años de<br>Garantía</span></div>
+          <div><b>5</b><span>Años de <a href="garantia.html">Garantía</a><br>Limitada</span></div>
           <div><b>$0</b><span>Estimado<br>Gratis</span></div>
-          <div><b>100%</b><span>Apto para<br>Niños y Mascotas</span></div>
+          <div><b>🐾</b><span>Apto para<br>Niños y Mascotas</span></div>
         </div>
       </div>
       <div class="hero-logo">
@@ -101,7 +104,7 @@
 
     <!-- FRANJA -->
     <section class="strip">
-      <p>Precio al por Mayor <i>•</i> Calidad Premium <i>•</i> Sin Mantenimiento <i>•</i> Ecológico <i>•</i> Hecho para Durar</p>
+      <p>Precio al por Mayor <i>•</i> Calidad Premium <i>•</i> Sin Mantenimiento <i>•</i> Sin Riego <i>•</i> Hecho para Durar</p>
     </section>
 
     <!-- PRODUCTOS -->
@@ -109,8 +112,8 @@
       <div class="section-head">
         <p class="eyebrow">Nuestra Grama</p>
         <h2>Grama que se Ve y se Siente Real</h2>
-        <p>Hojas multitono, fibra de base natural y tecnología de superficie fresca: tan realista que sus vecinos le preguntarán quién le corta el césped.
-          Todos nuestros productos tienen protección UV para el Sur de la Florida y están respaldados por nuestra garantía de 5 años.</p>
+        <p>Hojas multitono y fibra de base de aspecto natural: tan realista que sus vecinos le preguntarán quién le corta el césped.
+          Nuestra grama tiene protección UV para el sol del Sur de la Florida y cada instalación está respaldada por nuestra <a href="garantia.html">garantía limitada de 5 años</a>.</p>
       </div>
       <div class="cards cards-4">
         <article class="card">
@@ -131,7 +134,7 @@
         <article class="card">
           <div class="card-icon">🛝</div>
           <h3>Grama para Parques Infantiles</h3>
-          <p>Superficies acolchadas con opciones de amortiguación para caídas. Áreas de juego limpias, seguras y sin lodo.</p>
+          <p>Superficies acolchadas con opciones de base amortiguadora. Áreas de juego limpias y sin lodo.</p>
         </article>
       </div>
     </section>
@@ -167,9 +170,9 @@
             Desde un área para perros de 200 pies² hasta un proyecto comercial completo, nos encargamos de todo, desde la excavación hasta el cepillado final.</p>
           <ul class="why-list">
             <li><b>Precios al por mayor</b>: compre solo la grama o pídala completamente instalada.</li>
-            <li><b>Grama premium sin plomo</b>: fibras resistentes a los rayos UV que se mantienen verdes bajo el sol de la Florida.</li>
+            <li><b>Grama premium</b>: fibras con protección UV hechas para el sol de la Florida. Pídanos la ficha técnica del fabricante.</li>
             <li><b>Base y drenaje correctos</b>: base de agregado compactado preparada para las fuertes lluvias tropicales.</li>
-            <li><b>Garantía de 5 años</b>: en materiales y mano de obra.</li>
+            <li><b><a href="garantia.html">Garantía limitada de 5 años</a></b>: en materiales y mano de obra.</li>
             <li><b>Estimado gratis en su casa</b>: medidas, muestras y una cotización clara por escrito.</li>
           </ul>
         </div>
@@ -183,12 +186,12 @@
         <h2>Por qué los Propietarios de Miami se Pasan a la Grama Artificial</h2>
       </div>
       <div class="cards cards-3">
-        <article class="card stat"><b>Hasta 70%</b><h3>Ahorre Agua</h3><p>El riego exterior es la factura de agua más alta del Sur de la Florida. La grama artificial no necesita riego.</p></article>
+        <article class="card stat"><b>💧</b><h3>Ahorre Agua</h3><p>Sin sistema de riego que mantener, solo un enjuague de vez en cuando. Facturas de agua más bajas y sin preocuparse por las restricciones de riego.</p></article>
         <article class="card stat"><b>0 h</b><h3>Sin Cortar</h3><p>Sin cortar, abonar, desyerbar ni fumigar. Recupere sus fines de semana.</p></article>
         <article class="card stat"><b>365</b><h3>Días de Verde</h3><p>Sin manchas secas tras la sequía ni lodo tras las tormentas. Perfecta todo el año.</p></article>
         <article class="card stat"><b>🐶</b><h3>Ideal para Mascotas</h3><p>Sin huecos ni patas embarradas. Drena rápido y se limpia con agua.</p></article>
-        <article class="card stat"><b>🌱</b><h3>Ecológica</h3><p>Sin pesticidas ni fertilizantes que lleguen a la Bahía de Biscayne. Sin cortadoras de gasolina.</p></article>
-        <article class="card stat"><b>$</b><h3>Se Paga Sola</h3><p>El ahorro en agua, mantenimiento y jardinería cubre la inversión con el tiempo.</p></article>
+        <article class="card stat"><b>🌱</b><h3>Sin Químicos que Aplicar</h3><p>Sin fertilizantes ni pesticidas en su jardín, y sin cortadora de gasolina.</p></article>
+        <article class="card stat"><b>$</b><h3>Ahorro con el Tiempo</h3><p>Menos gastos de agua y de jardinería que ayudan a compensar la inversión año tras año.</p></article>
       </div>
     </section>
 
@@ -202,22 +205,10 @@
         <li><span>1</span><h3>Estimado Gratis</h3><p>Llámenos o envíe el formulario. Lo visitamos, medimos y le llevamos muestras.</p></li>
         <li><span>2</span><h3>Diseño y Cotización</h3><p>Elija su grama y el diseño. Reciba una cotización clara a precio de mayorista.</p></li>
         <li><span>3</span><h3>Instalación Profesional</h3><p>Excavación, malla antimaleza, base compactada, grama sin uniones visibles y relleno.</p></li>
-        <li><span>4</span><h3>Disfrute por Años</h3><p>Un césped perfecto sin mantenimiento, con garantía de 5 años.</p></li>
+        <li><span>4</span><h3>Disfrute por Años</h3><p>Un césped verde con muy poco mantenimiento, con nuestra garantía limitada de 5 años.</p></li>
       </ol>
     </section>
 
-    <!-- TESTIMONIOS -->
-    <section class="section">
-      <div class="section-head">
-        <p class="eyebrow">Opiniones</p>
-        <h2>Lo que Dicen Nuestros Clientes</h2>
-      </div>
-      <div class="cards cards-3">
-        <blockquote class="card quote"><p>“Nuestro patio pasó del lodo a un césped perfecto en dos días. A los perros les encanta y ya nunca regamos.”</p><footer>★★★★★ — Propietario, Kendall</footer></blockquote>
-        <blockquote class="card quote"><p>“El mejor precio que encontramos en Miami, y el equipo de instalación fue limpio y puntual. Parece grama de verdad.”</p><footer>★★★★★ — Propietaria, Doral</footer></blockquote>
-        <blockquote class="card quote"><p>“Pusieron grama en el área de la piscina y en la terraza de la azotea. Excelente drenaje incluso con las tormentas de verano.”</p><footer>★★★★★ — Administrador de Propiedades, Brickell</footer></blockquote>
-      </div>
-    </section>
 
     <!-- ZONAS -->
     <section class="section" id="areas">
@@ -239,12 +230,12 @@
         <h2>Preguntas sobre la Grama Artificial</h2>
       </div>
       <div class="faq">
-        <details><summary>¿Cuánto cuesta la grama artificial en Miami?</summary><p>Depende de la grama, del tamaño del área y de la preparación del terreno. Como vendemos a precios al por mayor, nuestras cotizaciones están entre las más competitivas de Miami. Llame al (786) 329-9117 para un estimado gratis.</p></details>
-        <details><summary>¿Cuánto dura la grama artificial?</summary><p>Una grama de calidad dura más de 15 años con un uso normal. Nuestras instalaciones tienen una garantía de 5 años.</p></details>
-        <details><summary>¿Se calienta demasiado con el sol de la Florida?</summary><p>Toda grama se calienta bajo el sol directo. Ofrecemos fibras y rellenos que reducen la temperatura de la superficie, y un enjuague rápido la refresca al instante.</p></details>
-        <details><summary>¿Es segura para perros y niños?</summary><p>Sí. Nuestra grama no contiene plomo y no es tóxica. La grama para mascotas tiene una base totalmente permeable y relleno antimicrobiano para controlar los olores.</p></details>
+        <details><summary>¿Cuánto cuesta la grama artificial en Miami?</summary><p>Depende de la grama, del tamaño del área y de la preparación del terreno. Como vendemos a precios al por mayor, nuestras cotizaciones son muy competitivas. Llame al (786) 329-9117 para un estimado gratis.</p></details>
+        <details><summary>¿Cuánto dura la grama artificial?</summary><p>La duración depende del producto, de la exposición al sol y del uso; le mostraremos las especificaciones del fabricante de la grama que elija. Nuestras instalaciones tienen una <a href="garantia.html">garantía limitada de 5 años</a>.</p></details>
+        <details><summary>¿Se calienta demasiado con el sol de la Florida?</summary><p>Toda grama se calienta bajo el sol directo. Las fibras de color más claro y algunos rellenos ayudan, y un enjuague rápido con la manguera refresca la superficie.</p></details>
+        <details><summary>¿Es segura para perros y niños?</summary><p>La grama artificial se usa mucho en patios, escuelas y parques para perros. Le entregaremos la información del producto y de seguridad del fabricante de su grama. La grama para mascotas tiene una base permeable y un relleno antimicrobiano que ayuda a controlar los olores.</p></details>
         <details><summary>¿Qué pasa cuando llueve mucho?</summary><p>El agua drena directamente a través de la base perforada y del suelo compactado: sin charcos ni lodo.</p></details>
-        <details><summary>¿Cuánto tarda la instalación?</summary><p>La mayoría de los jardines residenciales se terminan en 1 a 3 días.</p></details>
+        <details><summary>¿Cuánto tarda la instalación?</summary><p>Depende del tamaño del área y de la preparación del terreno. Su cotización por escrito incluye el calendario previsto.</p></details>
         <details><summary>¿Puedo comprar la grama sin instalación?</summary><p>Sí. Vendemos rollos a precios al por mayor a propietarios, jardineros y contratistas.</p></details>
       </div>
     </section>
@@ -258,13 +249,13 @@
             <li>Precio al por mayor</li>
             <li>Calidad premium</li>
             <li>Sin mantenimiento</li>
-            <li>Ecológico</li>
+            <li>Sin riego, sin fertilizantes</li>
             <li>Fabricado para durar</li>
           </ul>
           <a class="big-phone" href="tel:+17863299117">(786) 329-9117</a>
-          <a class="site-link" href="https://www.magicrealisticgrass.com" target="_blank" rel="noopener">www.magicrealisticgrass.com</a>
+          <a class="site-link" href="https://www.realisticgrass.com">www.realisticgrass.com</a>
           <div class="qr">
-            <img src="../assets/qr.png" alt="Código QR hacia www.magicrealisticgrass.com" width="120" height="120" loading="lazy">
+            <img src="../assets/qr.png" alt="Código QR hacia www.realisticgrass.com" width="120" height="120" loading="lazy">
             <span>Más información</span>
           </div>
         </div>
@@ -288,8 +279,9 @@
           </label>
           <label>Área aprox. (pies²)<input name="area" inputmode="numeric"></label>
           <label>Mensaje<textarea name="msg" rows="3"></textarea></label>
+          <p class="consent">Al enviar esta solicitud, usted acepta que Realistic Grass LLC le llame o le envíe mensajes de texto al número indicado sobre su estimado. No enviamos mensajes publicitarios sin su permiso. Pueden aplicarse tarifas de mensajes y datos. Consulte nuestra <a href="privacidad.html">Política de Privacidad</a>.</p>
           <button class="btn btn-yellow btn-lg" type="submit">Enviar mi Solicitud</button>
-          <p class="form-note">Estimado gratis · Garantía de 5 años · Sin compromiso</p>
+          <p class="form-note">Estimado gratis · Garantía limitada de 5 años · Sin compromiso</p>
         </form>
       </div>
     </section>
@@ -297,9 +289,11 @@
 
   <footer class="footer">
     <img src="../assets/logo.png" alt="" width="90" height="84" loading="lazy">
-    <p><b>Realistic Grass</b> — Grama Artificial · Miami, FL</p>
-    <p><a href="tel:+17863299117">(786) 329-9117</a> · <a href="https://www.magicrealisticgrass.com" target="_blank" rel="noopener">www.magicrealisticgrass.com</a></p>
-    <p class="small">© <span id="year"></span> Realistic Grass. Todos los derechos reservados.</p>
+    <p><b>Realistic Grass LLC</b> — Grama Artificial · Miami-Dade, FL</p>
+    <p>407 Lincoln Road, Suite 6J, Miami Beach, FL 33139</p>
+    <p><a href="tel:+17863299117">(786) 329-9117</a> · <a href="https://www.realisticgrass.com">www.realisticgrass.com</a></p>
+    <p class="footer-links"><a href="privacidad.html">Política de Privacidad</a> · <a href="garantia.html">Garantía Limitada</a> · <a href="privacidad.html#accesibilidad">Accesibilidad</a></p>
+    <p class="small">© <span id="year"></span> Realistic Grass LLC, sociedad de responsabilidad limitada de Florida (Doc. N.º L25000417235). Todos los derechos reservados.</p>
   </footer>
 
   <a href="tel:+17863299117" class="float-call" aria-label="Llamar al (786) 329-9117">📞</a>

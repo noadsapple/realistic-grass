@@ -7,6 +7,26 @@
   const BASE = (document.currentScript && document.currentScript.src) || location.href;
   const asset = (p) => new URL(p, BASE).href;
 
+  // "Pause animations" button (WCAG 2.2.2): stops the wind, the van and the tiles
+  let paused = false;
+  try { paused = localStorage.getItem("rg-paused") === "1"; } catch (e) { /* storage blocked */ }
+  const motionBtn = document.querySelector(".motion-toggle");
+  const applyPause = () => {
+    document.body.classList.toggle("paused", paused);
+    if (!motionBtn) return;
+    motionBtn.setAttribute("aria-pressed", String(paused));
+    motionBtn.textContent = paused ? motionBtn.dataset.play : motionBtn.dataset.pause;
+  };
+  if (motionBtn) {
+    if (reduceMotion) motionBtn.hidden = true;
+    motionBtn.addEventListener("click", () => {
+      paused = !paused;
+      try { localStorage.setItem("rg-paused", paused ? "1" : "0"); } catch (e) { /* ignore */ }
+      applyPause();
+    });
+  }
+  applyPause();
+
   /* ------------------------------------------------------------------
    * 1. Turf background swaying in the wind (WebGL).
    *    The photo is tiled (mirrored) and displaced by a travelling "gust"
@@ -102,10 +122,15 @@
         resize();
         window.addEventListener("resize", resize);
 
-        const start = performance.now();
+        let clock = 0, prev = performance.now(), drawn = false;
         const frame = (now) => {
-          gl.uniform1f(uT, (now - start) / 1000);
-          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          if (!paused) clock += Math.min(0.1, (now - prev) / 1000);
+          prev = now;
+          if (!paused || !drawn) {
+            gl.uniform1f(uT, clock);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            drawn = true;
+          }
           if (!reduceMotion) requestAnimationFrame(frame);
         };
         requestAnimationFrame(frame);
@@ -345,10 +370,12 @@
   }
 
   const SPEED = () => (innerWidth < 600 ? 90 : 150); // px per second
-  let dist = geo.lx * 0.15, last = performance.now();
+  let dist = geo.lx * 0.15, last = performance.now(), drivenOnce = false;
   const drive = (now) => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
+    if (paused && !reduceMotion && drivenOnce) { requestAnimationFrame(drive); return; }
+    drivenOnce = true;
     dist = (dist + SPEED() * dt) % geo.total;
     const [x, y, hRaw] = pointAt(dist);
     const h = ((hRaw % 360) + 360) % 360;

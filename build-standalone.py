@@ -63,6 +63,11 @@ def build(page, out, lang_links):
     html = html.replace('<link rel="icon" href="assets/logo.png">', '<link rel="icon" data-img="assets/logo.png">')
     for key in IMAGES:
         html = html.replace(f'src="{key}"', f'data-img="{key}"')
+    # Legal pages are not bundled: link to the published ones
+    live = "https://noadsapple.github.io/realistic-grass/"
+    sub = "es/" if page.startswith("es/") else ""
+    for doc in ("privacy.html", "warranty.html", "privacidad.html", "garantia.html"):
+        html = html.replace(f'href="{doc}', f'href="{live}{sub}{doc}')
     # EN | ES switcher points at the other standalone file
     for old, new in lang_links.items():
         html = html.replace(old, new)
