@@ -1,6 +1,6 @@
 // Square promo: lawn footage + transparent marketing overlay (social/promo.html) + voice-over/music.
-//   node social/render-promo.mjs <en|es> <background.mp4>
-//   → social/realistic-grass-promo-square-<lang>.mp4 (1080x1080, 30 fps, H.264 + AAC)
+//   node social/render-promo.mjs <en|es> <background.mp4> [square|vertical]
+//   → social/realistic-grass-promo-<format>-<lang>.mp4 (1080x1080 or 1080x1920, 30 fps, H.264 + AAC)
 // The background must already last timing-<lang>.json "duration" seconds (the lawn montage,
 // cropped square and time-stretched to the voice-over). Needs playwright, ffmpeg (FFMPEG=…) and
 // a static server on the repo root (BASE, default http://localhost:8799).
@@ -10,15 +10,17 @@ import { readFileSync } from "node:fs";
 
 const lang = process.argv[2] === "es" ? "es" : "en";
 const bg = process.argv[3];
+const format = process.argv[4] === "vertical" ? "vertical" : "square";
+const HEIGHT = format === "vertical" ? 1920 : 1080;
 const FPS = 30;
 const ffmpeg = process.env.FFMPEG || "ffmpeg";
-const out = `social/realistic-grass-promo-square-${lang}.mp4`;
+const out = `social/realistic-grass-promo-${format}-${lang}.mp4`;
 const T = JSON.parse(readFileSync(`social/timing-${lang}.json`, "utf8"));
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
-const page = await browser.newPage({ viewport: { width: 1080, height: 1080 } });
+const page = await browser.newPage({ viewport: { width: 1080, height: HEIGHT } });
 page.on("pageerror", (e) => console.error("page error:", e.message));
-await page.goto(`${process.env.BASE || "http://localhost:8799"}/social/promo.html?lang=${lang}`);
+await page.goto(`${process.env.BASE || "http://localhost:8799"}/social/promo.html?lang=${lang}&format=${format}`);
 await page.evaluate(() => window.READY);
 await page.evaluate((t) => window.setTiming(t), T);
 
