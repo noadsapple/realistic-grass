@@ -16,14 +16,13 @@ const name = process.argv[5] || "realistic-grass-promo";
 const WIDTH = format === "landscape" ? 1920 : 1080, HEIGHT = format === "vertical" ? 1920 : 1080;
 const FPS = 30;
 const ffmpeg = process.env.FFMPEG || "ffmpeg";
-const out = process.env.OUT || `social/${name}-${format}-${lang}.mp4`;
-// TIMING / AUDIO / HOOK env vars allow short cuts (e.g. 6 s bumpers with music only)
-const T = JSON.parse(readFileSync(process.env.TIMING || `social/timing-${lang}.json`, "utf8"));
+const out = `social/${name}-${format}-${lang}.mp4`;
+const T = JSON.parse(readFileSync(`social/timing-${lang}.json`, "utf8"));
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
 const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT } });
 page.on("pageerror", (e) => console.error("page error:", e.message));
-await page.goto(`${process.env.BASE || "http://localhost:8799"}/social/promo.html?lang=${lang}&format=${format}&hook=${process.env.HOOK || "a"}`);
+await page.goto(`${process.env.BASE || "http://localhost:8799"}/social/promo.html?lang=${lang}&format=${format}`);
 await page.evaluate(() => window.READY);
 await page.evaluate((t) => window.setTiming(t), T);
 
@@ -31,7 +30,7 @@ const enc = spawn(ffmpeg, [
   "-y", "-loglevel", "error",
   "-i", bg,                                                        // 0: footage
   "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "png", "-i", "-",   // 1: overlay frames (RGBA)
-  "-i", process.env.AUDIO || `social/audio-${lang}.wav`,                                // 2: voice-over + music
+  "-i", `social/audio-${lang}.wav`,                                // 2: voice-over + music
   "-filter_complex", "[0:v]fps=30,format=yuv420p[b];[b][1:v]overlay=0:0:format=auto,format=yuv420p[v]",
   "-map", "[v]", "-map", "2:a", "-t", String(T.duration),
   "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-profile:v", "high", "-level", "4.1",
