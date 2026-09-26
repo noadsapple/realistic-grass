@@ -134,6 +134,12 @@ const TXT = {
 }[LANG];
 document.documentElement.lang = LANG;
 const $ = (id) => document.getElementById(id);
+// Alternative hooks for A/B tests (?hook=b|c); "a" is the voice-over question
+const HOOKS = {
+  b: { en: ["Green lawn", "365 days", "<span class='y'>a year</span>"], es: ["Césped verde", "los 365 días", "<span class='y'>del año</span>"] },
+  c: { en: ["Stop mowing.", "Stop watering.", "<span class='y'>For good.</span>"], es: ["Olvídese", "de cortar", "<span class='y'>y regar</span>"] },
+};
+if (HOOKS[params.get("hook")]) TXT.hook = HOOKS[params.get("hook")][LANG];
 $("hook").innerHTML = TXT.hook.map((s) => `<div>${s}</div>`).join("");
 document.querySelector("#real .big").textContent = TXT.real;
 document.querySelector("#real .sub").textContent = TXT.realSub;
