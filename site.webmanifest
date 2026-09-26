@@ -1,0 +1,23 @@
+{
+  "name": "Realistic Grass – Artificial Grass Miami",
+  "short_name": "Realistic Grass",
+  "description": "Artificial turf installed in Miami-Dade at wholesale prices: lawns, pet turf, putting greens, pools. Free estimate · 5-year limited warranty.",
+  "lang": "en-US",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#0f4d2c",
+  "theme_color": "#0f4d2c",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
