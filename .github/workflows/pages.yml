@@ -28,7 +28,7 @@ jobs:
         run: |
           set -e
           rm -rf .git/ /tmp/site && mkdir /tmp/site
-          cp -r . /tmp/site/ && rm -rf /tmp/site/.github
+          cp -r . /tmp/site/ && rm -rf /tmp/site/.github /tmp/site/.claude /tmp/site/brag-output
           touch /tmp/site/.nojekyll
           cd /tmp/site
           git init -q -b gh-pages
