@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Realistic Grass — mockup</title>
+<meta name="description" content="Design mockup of the Realistic Grass website, in a quiet design-engineering style.">
+<link rel="icon" href="../assets/favicon-32.png">
+<style>
+  /* Mockup — styling principles from Emil Kowalski's design-engineering notes (github.com/emilkowalski/skills, MIT):
+     strong custom curves, UI motion under 300 ms, only transform/opacity/clip-path animated, press feedback,
+     no scale(0), hover gated to fine pointers, reduced motion respected. */
+  @font-face { font-family: "Inter"; font-weight: 400 800; font-display: swap; src: url("../assets/fonts/inter-latin-var.woff2") format("woff2"); }
+
+  :root {
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --bg: #fbfbfa; --panel: #ffffff; --ink: #171717; --muted: #6f6f6b; --faint: #a3a3a0;
+    --line: #ebebe8; --line-strong: #deded9; --accent: #1f7a3d; --accent-ink: #ffffff; --accent-soft: #eaf4ec;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0f0f0e; --panel: #171716; --ink: #ededec; --muted: #a1a19c; --faint: #6d6d69;
+    --line: #242422; --line-strong: #30302d; --accent: #4cc06b; --accent-ink: #07210f; --accent-soft: #132a19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35); } }
+  :root[data-theme="dark"] { --bg: #0f0f0e; --panel: #171716; --ink: #ededec; --muted: #a1a19c; --faint: #6d6d69;
+    --line: #242422; --line-strong: #30302d; --accent: #4cc06b; --accent-ink: #07210f; --accent-soft: #132a19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35); }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 "Inter", system-ui, sans-serif;
+         -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01"; }
+  a { color: inherit; }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Header ---------- */
+  header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 82%, transparent);
+           backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--line); }
+  .bar { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; letter-spacing: -.01em; }
+  .brand img { width: 28px; height: 28px; }
+  nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; color: var(--muted); }
+  nav a { text-decoration: none; transition: color 150ms ease; }
+  @media (hover: hover) and (pointer: fine) { nav a:hover { color: var(--ink); } }
+
+  /* Segmented EN/ES — the active colour is a clipped duplicate, so the colour change is perfectly in sync */
+  .seg { position: relative; display: inline-grid; grid-auto-flow: column; border: 1px solid var(--line-strong);
+         border-radius: 999px; padding: 3px; font-size: 13px; font-weight: 500; }
+  .seg .base, .seg .active { display: grid; grid-template-columns: 40px 40px; }
+  .seg button, .seg .active span { all: unset; box-sizing: border-box; height: 24px; line-height: 24px; border-radius: 999px;
+                                   text-align: center; cursor: pointer; }
+  .seg .base { color: var(--muted); }
+  .seg .active { position: absolute; left: 3px; top: 3px; pointer-events: none; background: var(--ink); border-radius: 999px; }
+  .seg .active span { color: var(--bg); }
+  .seg .active { clip-path: inset(0 50% 0 0 round 999px); transition: clip-path 220ms var(--ease-out); }
+  .seg[data-lang="es"] .active { clip-path: inset(0 0 0 50% round 999px); }
+
+  /* ---------- Buttons ---------- */
+  .btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+         height: 40px; padding: 0 16px; border-radius: 10px; font-weight: 500; font-size: 14px; cursor: pointer; white-space: nowrap;
+         transition: transform 160ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease; }
+  .btn:active { transform: scale(0.97); }
+  .btn:focus-visible, .seg button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-primary { background: var(--ink); color: var(--bg); }
+  .btn-accent { background: var(--accent); color: var(--accent-ink); }
+  .btn-ghost { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { background: color-mix(in srgb, var(--ink) 86%, var(--bg)); }
+    .btn-ghost:hover { background: var(--panel); }
+  }
+
+  /* ---------- Entrance (once, on load) ---------- */
+  .in { opacity: 0; transform: translateY(8px); animation: rise 500ms var(--ease-out) forwards; }
+  .in:nth-child(2) { animation-delay: 60ms; } .in:nth-child(3) { animation-delay: 120ms; } .in:nth-child(4) { animation-delay: 180ms; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 88px 0 56px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted);
+          border: 1px solid var(--line-strong); border-radius: 999px; padding: 4px 12px 4px 6px; }
+  .pill i { width: 18px; height: 18px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; }
+  .pill i::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.04; letter-spacing: -.035em; font-weight: 600; margin: 20px 0 16px; max-width: 12ch; }
+  h1 em { font-style: normal; color: var(--muted); }
+  .lead { font-size: 17px; color: var(--muted); max-width: 46ch; margin: 0 0 28px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 28px; font-size: 13px; color: var(--muted); }
+  .meta span::before { content: "✓"; color: var(--accent); margin-right: 6px; font-weight: 700; }
+
+  /* Hero image revealed with clip-path, then a slow, subtle wind drift (decorative, seen once) */
+  .shot { margin-top: 56px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow);
+          position: relative; aspect-ratio: 16 / 7; background: #2d5a2a;
+          clip-path: inset(0 0 100% 0 round 16px); animation: reveal 900ms var(--ease-in-out) 200ms forwards; }
+  @keyframes reveal { to { clip-path: inset(0 0 0 0 round 16px); } }
+  .shot .turf { position: absolute; inset: -4%; background: url("../assets/turf.jpg") center / 420px auto repeat;
+                animation: drift 14s ease-in-out infinite alternate; }
+  @keyframes drift { to { transform: translate3d(-18px, 6px, 0) scale(1.02); } }
+  .shot .van { position: absolute; left: 50%; bottom: 8%; width: min(46%, 420px); height: auto; transform: translateX(-50%);
+               filter: drop-shadow(0 18px 18px rgba(0,0,0,.35)); }
+  .shot .tag { position: absolute; left: 16px; top: 16px; background: rgba(255,255,255,.9); color: #171717; font-size: 12px;
+               font-weight: 500; padding: 5px 10px; border-radius: 8px; backdrop-filter: blur(8px); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .kicker { font-size: 13px; color: var(--accent); font-weight: 600; margin: 0 0 8px; }
+  h2 { font-size: clamp(26px, 3.6vw, 34px); letter-spacing: -.025em; line-height: 1.15; font-weight: 600; margin: 0 0 12px; max-width: 20ch; }
+  .sub { color: var(--muted); max-width: 52ch; margin: 0 0 36px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line);
+          border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .cell { background: var(--panel); padding: 22px; }
+  .cell h3 { font-size: 15px; font-weight: 600; margin: 12px 0 4px; letter-spacing: -.01em; }
+  .cell p { margin: 0; color: var(--muted); font-size: 14px; }
+  .ico { width: 32px; height: 32px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 16px; }
+
+  .steps { counter-reset: s; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
+  .steps li { counter-increment: s; }
+  .steps li::before { content: counter(s, decimal-leading-zero); font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .steps h3 { font-size: 15px; font-weight: 600; margin: 6px 0 4px; }
+  .steps p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  /* FAQ — native details, chevron rotates with a short ease-out */
+  .faq { border-top: 1px solid var(--line); }
+  details { border-bottom: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; padding: 16px 0; font-weight: 500; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: ""; width: 8px; height: 8px; margin-top: 6px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted);
+                   transform: rotate(45deg); transition: transform 200ms var(--ease-out); flex-shrink: 0; }
+  details[open] summary::after { transform: rotate(-135deg); }
+  details p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
+  details[open] p { animation: fade 200ms var(--ease-out); }
+  @keyframes fade { from { opacity: 0; transform: translateY(-4px); } }
+
+  .cta-band { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+              background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); }
+  .cta-band .phone { font-size: 28px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 48px; font-size: 13px; color: var(--muted); }
+  footer .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { text-decoration: none; } footer a:hover { color: var(--ink); }
+
+  /* ---------- Drawer (Vaul-style): iOS curve, drag with velocity dismiss, damping above the top ---------- */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); opacity: 0; pointer-events: none; z-index: 40;
+             transition: opacity 400ms var(--ease-drawer); }
+  .drawer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; margin: 0 auto; max-width: 520px;
+            background: var(--panel); border: 1px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,.18); transform: translateY(100%); visibility: hidden;
+            transition: transform 500ms var(--ease-drawer), visibility 0s linear 500ms;
+            padding: 10px 22px calc(22px + env(safe-area-inset-bottom)); touch-action: none; }
+  body.open .overlay { opacity: 1; pointer-events: auto; }
+  body.open .drawer { transform: translateY(0); visibility: visible; transition: transform 500ms var(--ease-drawer), visibility 0s; }
+  .drawer.dragging { transition: none; }
+  .handle { width: 40px; height: 5px; border-radius: 99px; background: var(--line-strong); margin: 0 auto 16px; cursor: grab; }
+  .drawer h3 { margin: 0 0 4px; font-size: 18px; letter-spacing: -.015em; }
+  .drawer .hint { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+  .field { display: grid; gap: 6px; min-width: 0; margin-bottom: 12px; font-size: 13px; font-weight: 500; }
+  .field input, .field select { font: inherit; font-size: 15px; height: 42px; padding: 0 12px; border-radius: 10px;
+         border: 1px solid var(--line-strong); background: var(--bg); color: var(--ink); transition: border-color 150ms ease; width: 100%; min-width: 0; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .drawer .btn { width: 100%; height: 44px; margin-top: 6px; }
+  .consent { font-size: 12px; color: var(--faint); margin: 10px 0 0; }
+
+  /* ---------- Toasts (Sonner-style): enter from below, stacked, transitions not keyframes ---------- */
+  .toaster { position: fixed; right: 20px; bottom: 20px; z-index: 60; width: min(356px, calc(100vw - 40px)); }
+  .toast { position: absolute; right: 0; bottom: 0; width: 100%; background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+           border-radius: 12px; box-shadow: var(--shadow); padding: 14px 16px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start;
+           transition: transform 400ms ease, opacity 400ms ease; transform: translateY(100%); opacity: 0; }
+  .toast.mounted { opacity: 1; }
+  .toast b { display: block; font-weight: 600; }
+  .toast span { color: var(--muted); font-size: 13px; }
+  .toast i { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 2px;
+             display: grid; place-items: center; color: var(--accent-ink); font-style: normal; font-size: 11px; font-weight: 800; }
+
+  @media (max-width: 800px) {
+    nav { display: none; } .seg { margin-left: auto; }
+    .grid { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr 1fr; }
+    .hero { padding-top: 56px; } .shot { aspect-ratio: 4 / 3; } .shot .van { width: 72%; }
+    .header-cta { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .in { animation: fade 200ms ease forwards; transform: none; }
+    .shot { animation: none; clip-path: none; } .shot .turf { animation: none; }
+    .drawer, .toast { transition: opacity 200ms ease; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#"><img src="../assets/logo-sm.webp" alt="" width="28" height="28">Realistic Grass</a>
+    <nav aria-label="Main"><a href="#services">Services</a><a href="#process">Process</a><a href="#faq">FAQ</a></nav>
+    <div class="seg" data-lang="en" role="group" aria-label="Language">
+      <span class="base"><button type="button" data-l="en" aria-pressed="true">EN</button><button type="button" data-l="es" aria-pressed="false">ES</button></span>
+      <span class="active" aria-hidden="true"><span>EN</span><span>ES</span></span>
+    </div>
+    <button class="btn btn-primary header-cta" data-open>Free estimate</button>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div class="in"><span class="pill"><i></i><span data-t="pill">Artificial turf · Miami-Dade</span></span></div>
+    <h1 class="in" data-t="h1">A lawn that stays green. <em>Without the work.</em></h1>
+    <p class="lead in" data-t="lead">Premium synthetic turf at wholesale prices, professionally installed. No mowing, no watering, no mud — built for the Florida sun, rain and pets.</p>
+    <div class="ctas in">
+      <button class="btn btn-accent" data-open data-t="cta1">Get a free estimate</button>
+      <a class="btn btn-ghost" href="tel:+17863299117">(786) 329-9117</a>
+    </div>
+    <div class="meta in"><span data-t="m1">Wholesale price</span><span data-t="m2">5-year limited warranty</span><span data-t="m3">English &amp; Español</span></div>
+    <figure class="shot" aria-label="Artificial turf and the Realistic Grass van">
+      <div class="turf"></div>
+      <img class="van" src="../assets/van-right.webp" alt="" width="640" height="320">
+      <figcaption class="tag" data-t="tag">Installed across Miami-Dade</figcaption>
+    </figure>
+  </div>
+
+  <section id="services">
+    <div class="wrap">
+      <p class="kicker" data-t="k1">Services</p>
+      <h2 data-t="h2a">One turf, every space.</h2>
+      <p class="sub" data-t="s1">Multi-tone blades and natural-looking thatch, UV-stabilized for South Florida.</p>
+      <div class="grid">
+        <div class="cell"><div class="ico">🌿</div><h3>Lawns</h3><p>Front yards, backyards and HOA communities.</p></div>
+        <div class="cell"><div class="ico">🐾</div><h3>Pet turf</h3><p>Permeable backing, easy to rinse.</p></div>
+        <div class="cell"><div class="ico">⛳</div><h3>Putting greens</h3><p>Custom greens in your own backyard.</p></div>
+        <div class="cell"><div class="ico">🏊</div><h3>Pools &amp; rooftops</h3><p>Pool surrounds, terraces and balconies.</p></div>
+        <div class="cell"><div class="ico">🛝</div><h3>Playgrounds</h3><p>Cushioned, mud-free play areas.</p></div>
+        <div class="cell"><div class="ico">📦</div><h3>Wholesale</h3><p>Turf rolls for homeowners and contractors.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="wrap">
+      <p class="kicker" data-t="k2">Process</p>
+      <h2 data-t="h2b">From estimate to green in four steps.</h2>
+      <p class="sub"></p>
+      <ol class="steps">
+        <li><h3>Free estimate</h3><p>We visit, measure and bring samples.</p></li>
+        <li><h3>Design &amp; quote</h3><p>A clear, wholesale-priced written quote.</p></li>
+        <li><h3>Installation</h3><p>Base, drainage, seamless turf, infill.</p></li>
+        <li><h3>Enjoy</h3><p>Covered by our 5-year limited warranty.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <p class="kicker">FAQ</p>
+      <h2 data-t="h2c">Questions, answered.</h2>
+      <p class="sub"></p>
+      <div class="faq">
+        <details><summary>How much does artificial grass cost?</summary><p>It depends on the turf, the size of the area and the site preparation. We sell at wholesale prices — call for a free estimate.</p></details>
+        <details><summary>Is it safe for dogs and kids?</summary><p>We'll give you the manufacturer's product and safety information for your turf. Pet turf uses a permeable backing to help control odors.</p></details>
+        <details><summary>What happens during heavy rain?</summary><p>Water drains through the perforated backing and the compacted base.</p></details>
+        <details><summary>Can I buy turf without installation?</summary><p>Yes — rolls at wholesale prices for homeowners, landscapers and contractors.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="cta-band">
+        <div><p class="kicker" style="margin:0 0 4px" data-t="k3">Call or text</p><div class="phone">(786) 329-9117</div></div>
+        <button class="btn btn-primary" data-open data-t="cta2">Get a free estimate</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span>Realistic Grass LLC · 407 Lincoln Road, Suite 6J, Miami Beach, FL 33139</span>
+    <span><a href="../privacy.html">Privacy</a> · <a href="../warranty.html">Limited warranty</a> · Design mockup</span>
+  </div>
+</footer>
+
+<div class="overlay" data-close></div>
+<div class="drawer" role="dialog" aria-modal="true" aria-labelledby="dtitle" aria-hidden="true">
+  <div class="handle" aria-hidden="true"></div>
+  <h3 id="dtitle">Free estimate</h3>
+  <p class="hint">Tell us about your project — we'll call or text you back.</p>
+  <form id="f">
+    <label class="field">Name<input name="name" required autocomplete="name"></label>
+    <div class="row2">
+      <label class="field">Phone<input name="phone" type="tel" required autocomplete="tel"></label>
+      <label class="field">ZIP<input name="zip" inputmode="numeric" autocomplete="postal-code"></label>
+    </div>
+    <label class="field">Project<select name="p"><option>Backyard / front yard</option><option>Pet area</option><option>Putting green</option><option>Pool surround</option><option>Commercial</option></select></label>
+    <button class="btn btn-primary" type="submit">Send request</button>
+    <p class="consent">Mockup — nothing is sent. On the live site, you agree that Realistic Grass LLC may call or text you about your estimate.</p>
+  </form>
+</div>
+<div class="toaster" aria-live="polite"></div>
+
+<script>
+(() => {
+  /* ---- Language segmented control (copy swap is illustrative in this mockup) ---- */
+  const T = {
+    es: { pill: "Grama artificial · Miami-Dade", h1: 'Un césped siempre verde. <em>Sin trabajo.</em>',
+          lead: "Grama sintética premium a precios al por mayor, instalada por profesionales. Sin cortar, sin regar, sin lodo — hecha para el sol, la lluvia y las mascotas de la Florida.",
+          cta1: "Pida su estimado gratis", cta2: "Pida su estimado gratis", m1: "Precio al por mayor", m2: "Garantía limitada de 5 años", m3: "Español & English",
+          tag: "Instalada en todo Miami-Dade", k1: "Servicios", h2a: "Una grama, todos los espacios.", s1: "Hojas multitono y fibra de aspecto natural, con protección UV para el Sur de la Florida.",
+          k2: "Proceso", h2b: "Del estimado al verde en cuatro pasos.", h2c: "Preguntas frecuentes.", k3: "Llame o escriba" },
+  };
+  const nodes = [...document.querySelectorAll("[data-t]")];
+  const EN = Object.fromEntries(nodes.map((n) => [n.dataset.t, n.innerHTML]));
+  const seg = document.querySelector(".seg");
+  seg.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const l = b.dataset.l; seg.dataset.lang = l; document.documentElement.lang = l;
+    seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    nodes.forEach((n) => { n.innerHTML = l === "es" ? (T.es[n.dataset.t] ?? EN[n.dataset.t]) : EN[n.dataset.t]; });
+  });
+
+  /* ---- Drawer ---- */
+  const drawer = document.querySelector(".drawer");
+  let lastFocus = null;
+  const open = () => { lastFocus = document.activeElement; document.body.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
+                       setTimeout(() => drawer.querySelector("input").focus({ preventScroll: true }), 300); };
+  const close = () => { document.body.classList.remove("open"); drawer.setAttribute("aria-hidden", "true"); drawer.style.transform = ""; lastFocus?.focus?.(); };
+  document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", open));
+  document.querySelector("[data-close]").addEventListener("click", close);
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("open")) close(); });
+
+  // drag: pointer capture, damping above the top, dismiss on distance OR velocity (quick flick)
+  let startY = 0, startT = 0, dy = 0, dragging = false;
+  drawer.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("input,select,button")) return;
+    if (dragging) return;                        // ignore extra touch points
+    dragging = true; startY = e.clientY; startT = performance.now(); dy = 0;
+    drawer.setPointerCapture(e.pointerId); drawer.classList.add("dragging");
+  });
+  drawer.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    dy = e.clientY - startY;
+    const y = dy < 0 ? -Math.sqrt(-dy) * 2 : dy;   // friction instead of a hard stop
+    drawer.style.transform = `translateY(${y}px)`;
+  });
+  const end = () => {
+    if (!dragging) return;
+    dragging = false; drawer.classList.remove("dragging");
+    const velocity = Math.abs(dy) / (performance.now() - startT);
+    if (dy > drawer.offsetHeight * 0.3 || (dy > 10 && velocity > 0.11)) close(); else drawer.style.transform = "";
+  };
+  drawer.addEventListener("pointerup", end); drawer.addEventListener("pointercancel", end);
+
+  /* ---- Toasts ---- */
+  const toaster = document.querySelector(".toaster");
+  function toast(title, desc) {
+    const el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status");
+    el.innerHTML = `<i>✓</i><div><b></b><span></span></div>`; el.querySelector("b").textContent = title; el.querySelector("span").textContent = desc;
+    toaster.appendChild(el);
+    const layout = () => [...toaster.children].reverse().forEach((t, i) => {
+      if (!t.classList.contains("mounted")) return;
+      t.style.transform = `translateY(${-i * 14}px) scale(${1 - i * 0.05})`; t.style.opacity = i > 2 ? 0 : 1; t.style.zIndex = 10 - i;
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add("mounted"); layout(); }));
+    let left = 4000, t0 = performance.now(), timer;
+    const run = () => { t0 = performance.now(); timer = setTimeout(remove, left); };
+    const pause = () => { clearTimeout(timer); left -= performance.now() - t0; };
+    const remove = () => { el.style.transform = "translateY(100%)"; el.style.opacity = 0; el.classList.remove("mounted");
+                           setTimeout(() => { el.remove(); layout(); }, 400); document.removeEventListener("visibilitychange", vis); };
+    const vis = () => (document.hidden ? pause() : run());   // timers pause while the tab is hidden
+    document.addEventListener("visibilitychange", vis); run();
+  }
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault(); close();
+    setTimeout(() => toast("Request received", "We'll call you back shortly — (786) 329-9117"), 250);
+  });
+})();
+</script>
+</body>
+</html>
