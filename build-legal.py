@@ -136,7 +136,7 @@ PRIVACY_EN = f"""      <p class="eyebrow">Legal</p>
       <h2>Information we collect</h2>
       <ul>
         <li><b>Information you give us</b>: when you use the free-estimate form, your device opens its messaging app with a text addressed to us containing the details you entered (name, phone number, city or ZIP code, project type, approximate area and your message). This website does not store what you type; we receive it only if you send the text. We also receive the information you give us when you call or text us.</li>
-        <li><b>Technical information</b>: this website is hosted on GitHub Pages, which may log IP addresses and basic request data for security and operations, under GitHub's own privacy policy.</li>
+        <li><b>Technical information</b>: our website hosting provider may log IP addresses and basic request data for security and operations, under its own privacy policy.</li>
         {ANALYTICS_EN}
       </ul>
 
@@ -185,7 +185,7 @@ PRIVACY_ES = f"""      <p class="eyebrow">Legal</p>
       <h2>Información que recopilamos</h2>
       <ul>
         <li><b>Información que usted nos da</b>: cuando usa el formulario de estimado gratis, su dispositivo abre su aplicación de mensajes con un texto dirigido a nosotros que contiene los datos que escribió (nombre, teléfono, ciudad o código postal, tipo de proyecto, área aproximada y su mensaje). Este sitio no guarda lo que usted escribe; solo lo recibimos si usted envía el mensaje. También recibimos la información que nos da cuando nos llama o nos escribe.</li>
-        <li><b>Información técnica</b>: este sitio está alojado en GitHub Pages, que puede registrar direcciones IP y datos básicos de las solicitudes por motivos de seguridad y funcionamiento, según la política de privacidad de GitHub.</li>
+        <li><b>Información técnica</b>: nuestro proveedor de alojamiento web puede registrar direcciones IP y datos básicos de las solicitudes por motivos de seguridad y funcionamiento, según su propia política de privacidad.</li>
         {ANALYTICS_ES}
       </ul>
 
