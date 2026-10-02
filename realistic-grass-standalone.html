@@ -877,7 +877,7 @@ document.documentElement.style.setProperty("--turf-img", `url("${IMG["assets/tur
    *    rotated to its heading, so the front points down on the right-hand
    *    side and up on the left-hand side. Heading right/down uses the
    *    right-facing photo, heading left/up the left-facing one (so it is
-   *    never upside-down), cross-fading in the two corners where they swap.
+   *    never upside-down), swapping instantly halfway through the two corners where they change.
    *
    *    Turf border: a strip of square sod tiles along the window edges
    *    (the page is padded by the same width). Each tile drops out of the
@@ -1104,11 +1104,9 @@ document.documentElement.style.setProperty("--turf-img", `url("${IMG["assets/tur
     const [x, y, hRaw] = pointAt(dist);
     const h = ((hRaw % 360) + 360) % 360;
     // Weight of the left-facing photo: 0 when heading right/down, 1 when left/up
-    let wL;
-    if (h <= 90) wL = 0;
-    else if (h <= 180) wL = smooth(100, 170, h);
-    else if (h <= 270) wL = 1;
-    else wL = 1 - smooth(280, 350, h);
+    // Swap photos instantly at mid-turn (135° / 315°), where both point the same way;
+    // a cross-fade would show two half-transparent vans on top of each other.
+    const wL = h > 135 && h <= 315 ? 1 : 0;
     van.style.transform = `translate3d(${x - W / 2}px, ${y - H / 2}px, 0)`;
     imgR.style.transform = `translateY(-50%) rotate(${h}deg)`;
     imgL.style.transform = `translateY(-50%) rotate(${h - 180}deg)`;
