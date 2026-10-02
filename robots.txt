@@ -1,0 +1,8 @@
+# Crawlers only read robots.txt at the root of a domain; this file takes effect
+# once the site is served from www.realisticgrass.com.
+User-agent: *
+Allow: /
+Disallow: /realistic-grass-standalone.html
+Disallow: /realistic-grass-standalone-es.html
+
+Sitemap: https://noadsapple.github.io/realistic-grass/sitemap.xml
