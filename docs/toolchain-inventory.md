@@ -14,3 +14,4 @@ Une ligne par fait, datée. Jamais une entrée "installé" sans installation ré
 - 2026-10-31 impeccable @2f97a85a4a87 + emilkowalski/skills (emil-design-eng animate review-animations) @a81dbca07f22
 - 2026-10-31 coreyhaines31/marketingskills (page-cro, copywriting, seo-audit, schema-markup, ai-seo) @88c79f6528a9
 - 2026-10-31 hallmark @4f6a46c6dc32 — appel explicite /hallmark uniquement, pas de hook
+- 2026-10-31 build déployé : es/index.html référence ../assets/logo-anim.js qui n'existe pas (404) — intégrer le logo depuis design/animated-logo ou retirer la balise au prochain déploiement

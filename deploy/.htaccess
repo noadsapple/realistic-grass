@@ -1,0 +1,18 @@
+# Apache only (ignored elsewhere): correct types for captions, manifest and fonts, plus browser caching
+AddType text/vtt .vtt
+AddType application/manifest+json .webmanifest
+AddType font/woff2 .woff2
+AddType video/mp4 .mp4
+AddType image/webp .webp
+DirectoryIndex index.html
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType video/mp4 "access plus 30 days"
+</IfModule>
