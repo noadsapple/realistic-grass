@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Realistic Grass – social video (render source)</title>
+<!--
+  Source of the social videos. Everything is driven by render(t) (t in seconds), so each frame is
+  deterministic; social/render-reel.mjs calls it for every frame and encodes the MP4.
+    ?lang=en|es          language
+    ?format=vertical     1080x1920 (TikTok, Reels, Stories) — default
+    ?format=square       1080x1080 (Facebook / Instagram feed)
+    &play                live preview in a browser
+  Scene timing comes from social/timing-<lang>.json (written by make-audio.py so the animation
+  follows the voice-over); render-reel.mjs passes it through setTiming().
+  Vertical safe zone: important text stays inside x 80–940, y 220–1500.
+-->
+<style>
+  @font-face { font-family: "Anton"; src: url("../assets/fonts/anton-latin.woff2") format("woff2"); }
+  @font-face { font-family: "Inter"; font-weight: 400 800; src: url("../assets/fonts/inter-latin-var.woff2") format("woff2"); }
+  html, body { margin: 0; overflow: hidden; background: #1f6b2a; }
+  #stage { position: relative; overflow: hidden; font-family: "Inter", sans-serif; color: #fff; }
+  canvas { position: absolute; left: 0; top: 0; }
+  .shade { position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(4,30,14,.55) 0%, rgba(4,30,14,.15) 30%, rgba(4,30,14,.1) 55%, rgba(4,30,14,.6) 100%); }
+  .abs { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+  #logo { transform-origin: 50% 50%; filter: drop-shadow(0 24px 30px rgba(0,0,0,.55)); }
+  .display { font-family: "Anton", Impact, sans-serif; text-transform: uppercase; line-height: .95; text-shadow: 0 8px 24px rgba(0,0,0,.55); }
+  #title, #tag, #cta { text-align: center; }
+  #title .l2 { color: #a6e04a; font-style: italic; }
+  #tag { font-weight: 800; text-shadow: 0 4px 16px rgba(0,0,0,.7); }
+  #tag span { display: block; }
+  #tag b { color: #ffd60a; }
+  #list { margin: 0; padding: 0; }
+  #list li { list-style: none; display: flex; align-items: center; font-family: "Anton", sans-serif;
+             text-transform: uppercase; text-shadow: 0 6px 18px rgba(0,0,0,.6); will-change: transform, opacity; }
+  #list li i { border-radius: 50%; background: #8cc63f; color: #0b2615; display: grid; place-items: center; flex-shrink: 0;
+               font-style: normal; font-family: "Inter", sans-serif; font-weight: 900; box-shadow: 0 6px 18px rgba(0,0,0,.4); }
+  #list li.hl { color: #ffd60a; }
+  #cta .pill { display: inline-block; background: #ffd60a; color: #0b2615; font-family: "Anton", sans-serif;
+               text-transform: uppercase; border-radius: 999px; box-shadow: 0 14px 30px rgba(0,0,0,.4); }
+  #cta .sub, #cta .web { font-weight: 800; text-shadow: 0 4px 14px rgba(0,0,0,.7); }
+  #cta .phone { font-family: "Anton", sans-serif; color: #ffd60a; text-shadow: 0 10px 28px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="turf"></canvas>
+  <div class="shade"></div>
+  <canvas id="sod"></canvas>
+  <img id="logo" class="abs" src="../assets/logo.webp" alt="">
+  <div id="title" class="abs display"><div class="l1"></div><div class="l2">Miami</div></div>
+  <div id="tag" class="abs"></div>
+  <img id="van" class="abs" src="../assets/van-right.webp" alt="">
+  <ul id="list" class="abs"></ul>
+  <div id="cta" class="abs"><div class="pill"></div><div class="sub"></div><div class="phone">(786) 329-9117</div>
+    <div class="web">www.realisticgrass.com</div></div>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const LANG = params.get("lang") === "es" ? "es" : "en";
+const SQUARE = params.get("format") === "square";
+const W = 1080, H = SQUARE ? 1080 : 1920;
+
+const TXT = {
+  en: { l1: "Artificial Grass", tag: ["No mowing.", "No watering.", "<b>No mud.</b>"],
+        list: ["Wholesale price", "Premium quality", "Maintenance-free", "5-Year Limited Warranty"],
+        pill: "Free Estimate", sub: "Call or text today · English & Español" },
+  es: { l1: "Grama Artificial", tag: ["Sin cortar.", "Sin regar.", "<b>Sin lodo.</b>"],
+        list: ["Precio al por mayor", "Calidad premium", "Sin mantenimiento", "Garantía limitada 5 años"],
+        pill: "Estimado Gratis", sub: "Llame o escriba hoy · Español & English" },
+}[LANG];
+
+/* Layout per format (px). y values are top edges. */
+const LAYOUT = SQUARE ? {
+  logo: { w: 430, x: 325, y: 80, upScale: 0.46, upY: -95 },
+  title: { y: 560, s1: 104, s2: 184 },
+  tag: { y: 300, size: 66 },
+  van: { w: 470, y: 580, endY: 665 },
+  tile: 80, rowY: 945,
+  list: { x: 110, y: 290, size: 58, gap: 24, icon: 70, iconFont: 44, iconGap: 22 },
+  cta: { y: 250, pill: 64, pillPad: "10px 44px 14px", sub: 34, subTop: 18, phone: 124, phoneTop: 22, web: 42, webTop: 8 },
+} : {
+  logo: { w: 560, x: 260, y: 250, upScale: 0.53, upY: -70 },
+  title: { y: 860, s1: 132, s2: 230 },
+  tag: { y: 640, size: 80 },
+  van: { w: 640, y: 1060, endY: 1180 },
+  tile: 90, rowY: 1455,
+  list: { x: 90, y: 640, size: 70, gap: 34, icon: 86, iconFont: 54, iconGap: 28 },
+  cta: { y: 630, pill: 84, pillPad: "14px 54px 18px", sub: 44, subTop: 26, phone: 150, phoneTop: 40, web: 52, webTop: 18 },
+};
+
+/* Scene timing (s); replaced by setTiming() with the values derived from the voice-over. */
+let T = { hookEnd: 2.6, vanStart: 2.65, vanEnd: 7.4, listStart: 7.6, ctaStart: 11.1, duration: 15 };
+window.setTiming = (t) => { T = { ...T, ...t }; window.DURATION = T.duration; buildTiles(); };
+
+const $ = (id) => document.getElementById(id);
+const px = (v) => v + "px";
+document.documentElement.lang = LANG;
+for (const el of [document.body, $("stage")]) { el.style.width = px(W); el.style.height = px(H); }
+for (const c of [$("turf"), $("sod")]) { c.width = W; c.height = H; }
+const L = LAYOUT;
+Object.assign($("logo").style, { width: px(L.logo.w), left: px(L.logo.x), top: px(L.logo.y) });
+Object.assign($("title").style, { width: px(W), top: px(L.title.y) });
+document.querySelector("#title .l1").style.fontSize = px(L.title.s1);
+document.querySelector("#title .l2").style.fontSize = px(L.title.s2);
+document.querySelector("#title .l1").textContent = TXT.l1;
+Object.assign($("tag").style, { width: px(W), top: px(L.tag.y), fontSize: px(L.tag.size) });
+$("tag").innerHTML = TXT.tag.map((s) => `<span>${s}</span>`).join("");
+$("van").style.width = px(L.van.w);
+Object.assign($("list").style, { left: px(L.list.x), top: px(L.list.y), width: px(W - 2 * L.list.x) });
+$("list").innerHTML = TXT.list.map((s, i) => `<li class="${i === 3 ? "hl" : ""}"><i>✓</i>${s}</li>`).join("");
+document.querySelectorAll("#list li").forEach((li) => {
+  Object.assign(li.style, { fontSize: px(L.list.size), margin: `0 0 ${px(L.list.gap)}`, gap: px(L.list.iconGap) });
+  Object.assign(li.querySelector("i").style, { width: px(L.list.icon), height: px(L.list.icon), fontSize: px(L.list.iconFont) });
+});
+Object.assign($("cta").style, { width: px(W), top: px(L.cta.y) });
+const cta = (sel, css) => Object.assign(document.querySelector("#cta " + sel).style, css);
+cta(".pill", { fontSize: px(L.cta.pill), padding: L.cta.pillPad });
+cta(".sub", { fontSize: px(L.cta.sub), marginTop: px(L.cta.subTop) });
+cta(".phone", { fontSize: px(L.cta.phone), marginTop: px(L.cta.phoneTop) });
+cta(".web", { fontSize: px(L.cta.web), marginTop: px(L.cta.webTop) });
+document.querySelector("#cta .pill").textContent = TXT.pill;
+document.querySelector("#cta .sub").textContent = TXT.sub;
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const backOut = (x) => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+
+/* ---------- Turf background with wind (same shader as the website) ---------- */
+const gl = $("turf").getContext("webgl", { preserveDrawingBuffer: true });
+const fs = `precision mediump float;
+uniform sampler2D tex; uniform vec2 res; uniform float t; uniform float tile;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+void main(){
+  vec2 px=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y); vec2 p=px/res.y; float scale=tile/520.;
+  vec2 w=p*2.2-vec2(t*.32,t*.07); float g=noise(w)*.65+noise(w*2.3+3.1)*.35; g=smoothstep(.2,.85,g);
+  float n=noise(px*.015/scale); float fl=sin(px.x*.05+px.y*.03+t*5.+n*6.2831);
+  vec2 d=vec2(1.,.3)*(g*7.+fl*(.6+g*1.2))*scale; vec2 uv=(px-d)/vec2(tile,tile*2.);
+  vec3 c=texture2D(tex,uv).rgb; c*=.9+g*.24; c=mix(c,c*vec3(1.04,1.1,.92),g*.35); gl_FragColor=vec4(c,1.);}`;
+const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+gl.viewport(0, 0, W, H);
+gl.uniform2f(gl.getUniformLocation(prog, "res"), W, H);
+gl.uniform1f(gl.getUniformLocation(prog, "tile"), 760);
+const uT = gl.getUniformLocation(prog, "t");
+
+/* ---------- Turf tiles laid by the van ---------- */
+const sod = $("sod").getContext("2d");
+const TILE = L.tile, ROW_Y = L.rowY, N = Math.ceil(W / TILE);
+const VAN_W = L.van.w, VAN_H = VAN_W * 0.5;
+const vanX = (t) => -VAN_W - 40 + (W + VAN_W + 80) * seg(t, T.vanStart, T.vanEnd);
+const rearX = (t) => vanX(t) + VAN_W * 0.1;
+let tileBorn = [];
+function buildTiles() {                                 // when the van's rear passes slot i
+  const x0 = rearX(T.vanStart), x1 = rearX(T.vanEnd);
+  tileBorn = [...Array(N)].map((_, i) => T.vanStart + (T.vanEnd - T.vanStart) * (i * TILE + TILE / 2 - x0) / (x1 - x0));
+}
+buildTiles();
+let rnd = 7; const rand = () => ((rnd = (rnd * 16807) % 2147483647) / 2147483647);
+const spin = [...Array(N)].map(() => (rand() - 0.5) * 160);
+const sprites = [];
+const turfImg = new Image();
+
+function buildSprites() {
+  for (let k = 0; k < 6; k++) {
+    const c = document.createElement("canvas"); c.width = c.height = TILE;
+    const g = c.getContext("2d");
+    g.drawImage(turfImg, rand() * (turfImg.width - 300), rand() * (turfImg.height - 300), 300, 300, 0, 0, TILE, TILE);
+    const gr = g.createLinearGradient(0, 0, TILE, TILE);
+    gr.addColorStop(0, "rgba(255,255,190,.32)"); gr.addColorStop(1, "rgba(0,0,0,.08)");
+    g.fillStyle = gr; g.fillRect(0, 0, TILE, TILE);
+    g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 2; g.strokeRect(1, 1, TILE - 2, TILE - 2);
+    sprites.push(c);
+  }
+}
+
+function drawSod(t) {
+  sod.clearRect(0, 0, W, H);
+  sod.fillStyle = "rgba(58,42,24,.92)"; sod.fillRect(0, ROW_Y - TILE / 2, W, TILE);   // soil groove
+  for (let i = 0; i < N; i++) {
+    if (t < tileBorn[i]) continue;
+    const p = seg(t, tileBorn[i], tileBorn[i] + 0.5);
+    const e = easeOut(p), lift = Math.sin(Math.PI * p) * 0.5;
+    const fx = rearX(tileBorn[i]), fy = L.van.y + VAN_H * 0.66;
+    const sx = i * TILE + TILE / 2;
+    const x = fx + (sx - fx) * e, y = fy + (ROW_Y - fy) * e;
+    const size = TILE * (1 + lift) * (p >= 1 ? 1 - Math.max(0, 1 - (t - tileBorn[i] - 0.5) / 0.15) * 0.08 : 1);
+    sod.globalAlpha = Math.min(1, p * 4);
+    if (lift > 0.02) { sod.fillStyle = "rgba(0,0,0,.3)"; sod.fillRect(x - size / 2 + lift * 22, y - size / 2 + lift * 26, size, size); }
+    sod.save(); sod.translate(x, y); sod.rotate((spin[i] * (1 - e) * Math.PI) / 180);
+    if (lift > 0.02) { sod.fillStyle = "#4a3620"; sod.fillRect(-size / 2 + 2, -size / 2 + size * 0.14, size, size); }
+    sod.drawImage(sprites[i % sprites.length], -size / 2, -size / 2, size, size);
+    sod.restore();
+  }
+  sod.globalAlpha = 1;
+}
+
+/* ---------- Scene timeline ---------- */
+function render(t) {
+  gl.uniform1f(uT, 3 + t * 1.15); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Logo pops in, then moves up and stays
+  const pop = backOut(seg(t, 0.15, 0.95));
+  const up = easeInOut(seg(t, T.hookEnd - 0.3, T.hookEnd + 0.4));
+  $("logo").style.opacity = seg(t, 0.15, 0.4);
+  $("logo").style.transform = `translateY(${L.logo.upY * up}px) scale(${(0.2 + 0.8 * pop) * (1 - (1 - L.logo.upScale) * up)})`;
+
+  // Title "Artificial Grass / Miami"
+  const ti = easeOut(seg(t, 0.6, 1.2)), to = seg(t, T.hookEnd - 0.4, T.hookEnd);
+  $("title").style.opacity = ti * (1 - to);
+  $("title").style.transform = `translateY(${(1 - ti) * 120 - to * 80}px)`;
+
+  // Tagline while the van drives
+  document.querySelectorAll("#tag span").forEach((el, i) => {
+    const a = easeOut(seg(t, T.vanStart + 0.35 + i * 0.45, T.vanStart + 0.75 + i * 0.45));
+    const o = seg(t, T.vanEnd - 0.1, T.vanEnd + 0.3);
+    el.style.opacity = a * (1 - o);
+    el.style.transform = `translateX(${(1 - a) * -140}px)`;
+  });
+
+  // Van: drives across, then comes back and parks for the end card
+  let vx, vy = L.van.y;
+  if (t < T.ctaStart) vx = vanX(t);
+  else { vx = -VAN_W + easeOut(seg(t, T.ctaStart, T.ctaStart + 1.3)) * (VAN_W + (W - VAN_W) / 2); vy = L.van.endY; }
+  const moving = (t > T.vanStart && t < T.vanEnd) || (t > T.ctaStart && t < T.ctaStart + 1.3);
+  vy += moving ? Math.sin(t * 38) * 2 : 0;
+  $("van").style.transform = `translate(${vx}px, ${vy}px)`;
+  $("van").style.opacity = t < T.ctaStart ? 1 : seg(t, T.ctaStart, T.ctaStart + 0.2);
+
+  // Benefits checklist
+  const step = Math.min(0.9, (T.ctaStart - T.listStart - 1.2) / 4);
+  document.querySelectorAll("#list li").forEach((el, i) => {
+    const a = backOut(seg(t, T.listStart + i * step, T.listStart + 0.5 + i * step));
+    const o = seg(t, T.ctaStart - 0.35, T.ctaStart - 0.05);
+    el.style.opacity = clamp(a) * (1 - o);
+    el.style.transform = `translateX(${(1 - a) * -700}px)`;
+  });
+
+  // End card
+  const c = backOut(seg(t, T.ctaStart + 0.1, T.ctaStart + 0.8));
+  $("cta").style.opacity = seg(t, T.ctaStart + 0.1, T.ctaStart + 0.4);
+  $("cta").style.transform = `scale(${0.7 + 0.3 * c})`;
+  const pulse = 1 + 0.035 * Math.max(0, Math.sin((t - T.ctaStart - 1) * 5));
+  document.querySelector("#cta .phone").style.transform = `scale(${t > T.ctaStart + 1 ? pulse : 1})`;
+
+  drawSod(t);
+}
+
+window.READY = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map((im) => im.decode().catch(() => {})),
+  new Promise((ok) => {
+    turfImg.onload = () => {
+      const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, turfImg);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      buildSprites(); ok();
+    };
+    turfImg.src = "../assets/turf.jpg";
+  }),
+]).then(() => { render(0); return true; });
+window.render = render;
+window.DURATION = T.duration;
+window.SIZE = { width: W, height: H };
+
+if (params.has("play")) {
+  window.READY.then(() => { const t0 = performance.now();
+    const loop = (now) => { render(((now - t0) / 1000) % T.duration); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop); });
+}
+</script>
+</body>
+</html>
