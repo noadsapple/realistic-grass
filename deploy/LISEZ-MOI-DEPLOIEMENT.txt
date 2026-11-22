@@ -1,0 +1,27 @@
+REALISTIC GRASS — PAQUET DE DÉPLOIEMENT
+=======================================
+
+1. Décompressez les 3 ZIP dans le MÊME dossier (ils se complètent) :
+   - realistic-grass-site.zip        → le site (pages, styles, images, polices, sous-titres)
+   - realistic-grass-videos-EN.zip   → social/*-en.mp4
+   - realistic-grass-videos-ES.zip   → social/*-es.mp4
+
+2. Envoyez tout le contenu du dossier « realistic-grass-site » à la RACINE de votre hébergement
+   (souvent « public_html », « www » ou « htdocs »), en conservant les sous-dossiers :
+   assets/  es/  social/  index.html  privacy.html  warranty.html  styles.css  script.js
+   sitemap.xml  robots.txt  site.webmanifest  .htaccess (fichier caché)
+
+3. Le site est prévu pour l'adresse https://www.realisticgrass.com/
+   (liens canoniques, versions EN/ES pour Google, sitemap, aperçus de partage).
+   Pour une autre adresse, demandez un nouveau paquet.
+
+4. Aucun serveur spécial n'est nécessaire : ce sont des fichiers statiques (HTML/CSS/JS).
+   Fonctionne sur tout hébergeur (Apache, Nginx, Netlify, Cloudflare Pages, Vercel, OVH, Hostinger…).
+   Le fichier .htaccess (Apache) déclare les types des sous-titres (.vtt) et des polices, et la mise en cache.
+
+5. Après la mise en ligne :
+   - Activez le HTTPS (certificat gratuit Let's Encrypt chez la plupart des hébergeurs).
+   - Redirigez realisticgrass.com (sans www) vers https://www.realisticgrass.com/.
+   - Google Search Console : ajoutez la propriété et soumettez sitemap.xml.
+
+Pages : /  (anglais) · /es/ (espagnol) · /privacy.html · /warranty.html · /es/privacidad.html · /es/garantia.html
